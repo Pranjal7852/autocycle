@@ -1,0 +1,107 @@
+name: Create AI App
+run-name: AI
+on:
+  workflow_call:
+    secrets:
+      GHCR_PAT:
+        required: true
+      GH_ACTIONS_BOT_ACCESS_TOKEN:
+        required: true
+jobs:
+  deploy-ai:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Context Variable
+        id: context_var
+        run: |
+          echo "CONTEXT=ai" >> "$GITHUB_ENV"
+
+      - name: Variables
+        id: vars
+        run: |
+          echo "VERSION=1.0.${{ github.run_number }}" >> "$GITHUB_ENV"
+          echo "IMAGE=ghcr.io/digitalproductschool/${{ github.event.repository.name }}/${{ env.CONTEXT }}" >> "$GITHUB_ENV"
+          echo "RUN_IMAGE=ghcr.io/digitalproductschool/${{ github.event.repository.name }}/ai-run-image" >> "$GITHUB_ENV"
+
+      - name: Extract env vars
+        id: env_vars
+        run: |
+          if [ -f "env_vars_file.txt" ]; then
+  
+          # Read values from the file
+          env_var=$(grep "env:" env_vars_file.txt | awk '{print $2}')
+        
+          # Print the extracted values
+          echo "environment=$env_var" >> "$GITHUB_ENV"
+        
+          else
+            echo "File env_vars_file.txt does not exist."
+          fi
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Github Packages
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Build docker image and push to GitHub Container Registry
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.CONTEXT }}
+          file: ${{ env.CONTEXT }}/run.Dockerfile
+          # Note: tags has to be all lower-case
+          tags: ${{env.RUN_IMAGE}}
+          # build on feature branches, push only on main branch
+          push: true
+
+      - name: Setup pack
+        id: setup-pack
+        uses: buildpacks/github-actions/setup-pack@v5.1.0
+      
+      - name: Build image and push to GitHub Container Registry
+        id: package
+        run: |
+          #!/usr/bin/env bash
+          pack build --path ${DIR} --env-file ${DIR}/pack_envfile --builder gcr.io/buildpacks/builder:v1 --publish ${REPO}:${TAG} --run-image ${RUN_IMAGE}
+        shell: bash
+        env:
+          REPO: ${{ env.IMAGE }}
+          TAG: ${{ env.VERSION }}
+          DIR: ./${{ env.CONTEXT }}
+          RUN_IMAGE: ${{ env.RUN_IMAGE }}
+
+      - name: Create Argo App
+        run: |
+          chmod +x deployment/scripts/create-argo-app.sh
+          ./deployment/scripts/create-argo-app.sh  ${{ env.ENV }} ${{ env.CONTEXT }} ${{ github.event.repository.name }}
+
+      - name: Update Helm
+        run: |
+          chmod +x deployment/scripts/update-helm-values.sh
+          ./deployment/scripts/update-helm-values.sh ${{ env.VERSION }} ${{ env.IMAGE }}  "" ${{ env.ENV }} "" "" ${{ env.CONTEXT }} ${{ github.event.repository.name }}
+      
+      - name: Delete env vars file
+        run: rm -rf env_vars_file.txt
+
+      - name: Commit changes
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "Deploy ${{ env.CONTEXT }} to ${{ env.ENV }} 🤖"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GH_ACTIONS_BOT_ACCESS_TOKEN}}
+          branch: ${{ github.ref }}

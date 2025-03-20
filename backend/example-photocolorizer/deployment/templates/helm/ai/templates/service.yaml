@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai
+  labels:
+    app.kubernetes.io/name: {{ template "dps-ai.name" . }}
+    {{- include "dps-ai.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: ai-api
+      protocol: "TCP"
+      port: 8000
+      targetPort: 8000 # The port on our API will be running
+    - name: ai-app
+      protocol: "TCP"
+      port: 7860
+      targetPort: 7860 # The port on our APP will be running
+  selector:
+    app.kubernetes.io/name: {{ template "dps-ai.name" . }}
+    {{- include "dps-ai.selectorLabels" . | nindent 4 }}
