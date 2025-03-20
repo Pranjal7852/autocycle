@@ -1,0 +1,32 @@
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ template "dps-ai.name" . }}
+  labels:
+    app.kubernetes.io/name: {{ template "dps-ai.name" . }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /ai/$2
+    {{- if .Values.tls.enabled }}
+    cert-manager.io/cluster-issuer: letsencrypt-dps
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+  - http:
+      paths:
+      - path: /ai(/|$)(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: ai
+            port:
+              number: 8000
+    host: {{ .Values.ingress.host }}
+  {{- if .Values.tls.enabled }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: dps-template-certificate
+  {{- end }}
