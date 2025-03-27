@@ -9,8 +9,8 @@ export default function Home() {
             <Image
               src="/images/dps-logo.png"
               alt="DPS logo"
-              width={250}
-              height={48}
+              width={150}
+              height={68}
               priority
             />
           </div>
@@ -19,22 +19,21 @@ export default function Home() {
             <Image
               src="/images/bmw-logo.png"
               alt="BMW logo"
-              width={180}
+              width={60}
               height={38}
               priority
             />
            
           </div>
         </div>
-
-<h1>Team Autocycle</h1>
+        <h1 className="text-center w-full text-4xl font-bold tracking-wider">COMING SOON</h1>
        
         <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
           <li className="mb-2 tracking-[-.01em]">
-            Trust the Process.
+            Trusting the Process.
           </li>
           <li className="tracking-[-.01em]">
-            Just Do It!
+            Just Doing It!
           </li>
         </ol>
 
