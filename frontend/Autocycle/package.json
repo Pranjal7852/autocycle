@@ -23,6 +23,7 @@
     "@mui/material": "7.0.1",
     "@mui/material-nextjs": "7.0.0",
     "axios": "1.8.4",
+    "firebase": "^11.6.0",
     "framer-motion": "11.11.17",
     "lodash-es": "4.17.21",
     "next": "15.2.4",
