@@ -10,9 +10,6 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
-    "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
-    "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "knip": "knip"
   },
   "dependencies": {
@@ -20,8 +17,9 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/lab": "7.0.0-beta.10",
-    "@mui/material": "7.0.1",
+    "@mui/material": "^7.0.2",
     "@mui/material-nextjs": "7.0.0",
+    "@mui/system": "^7.0.2",
     "axios": "1.8.4",
     "firebase": "^11.6.0",
     "framer-motion": "11.11.17",
@@ -41,7 +39,6 @@
     "eslint-config-next": "15.2.4",
     "eslint-config-prettier": "10.1.1",
     "eslint-plugin-prettier": "5.2.5",
-    "prettier": "3.5.3",
     "typescript": "5.8.3"
   },
   "resolutions": {

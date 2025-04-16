@@ -4,23 +4,24 @@ import Image from 'next/image';
 import { Container, Grid, Stack, Box, Typography } from '@mui/material';
 import { AboutGroup } from '@/components/cards/about-card';
 import Wave from '@/images/graphics/Wave';
+
 // Define gallery items (replace with your data)
 const galleryItems = [
     {
         id: 1,
-        
+        title: 'BMW AG, Recycling & Demontage Zentrum (RDZ): setting the pace on the path to circularity for 30 years.',
         description: 'BMW AG, Recycling & Demontage Zentrum (RDZ): setting the pace on the path to circularity for 30 years.',
         image: '/assets/images/team/team3.JPG', // Replace with your image path
     },
     {
         id: 2,
-       
+        title: 'Circular Economy @ Collab Munich Event.',
         description: 'Circular Economy @ Collab Munich Event.',
         image: '/assets/images/team/team2.png',
     },
     {
         id: 3,
-        
+        title:  'BMW recycle plant Visit at Garching, Munchen',
         description: 'BMW recycle plant Visit at Garching, Munchen',
         image: '/assets/images/team/team1.png',
     },
@@ -92,105 +93,8 @@ const GallerySection: React.FC = () => {
 
                 </Typography>
             </Box>
-            {/* Image Grid */}
-            <Grid container spacing={2} justifyContent="center">
-                {/* Portrait Image (Left) */}
-                <Grid item xs={12} md={6}>
-                    <Box sx={{ maxWidth: 350, mx: 'auto' }}>
-                        <Box
-                            sx={{
-                                position: 'relative',
-                                width: '100%',
-                                aspectRatio: '9/16',
-                                borderRadius: '12px',
-                                overflow: 'hidden',
-                            }}
-                        >
-                            <Image
-                                src={galleryItems[0].image}
-                                alt={galleryItems[0].title}
-                                fill
-                                style={{ objectFit: 'cover', transform: 'scale(1.05)' }}
-                                priority
-                            />
-                        </Box>
-                        <Box sx={{ mt: 3, textAlign: 'center' }}>
-                            <Typography variant="body2" sx={{ fontSize: '0.875rem', color: '#4B5563', mt: 0.5 }}>
-                                {galleryItems[0].description}
-                            </Typography>
-                        </Box>
-                    </Box>
-                </Grid>
-
-                {/* Landscape Images (Right, Stacked) */}
-                <Grid
-                    item
-                    xs={12}
-                    md={6}
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center', // Vertically center the Stack
-                        justifyContent: 'center',
-                    }}
-                >
-                    <Stack direction="column" spacing={2} sx={{ maxWidth: 350, mx: 'auto' }}>
-                        {/* Top Landscape */}
-                        <Box>
-                            <Box
-                                sx={{
-                                    position: 'relative',
-                                    width: '100%',
-                                    aspectRatio: '16/9',
-                                    borderRadius: '12px',
-                                    overflow: 'hidden',
-                                }}
-                            >
-                                <Image
-                                    src={galleryItems[1].image}
-                                    alt={galleryItems[1].title}
-                                    fill
-                                    style={{ objectFit: 'cover', transform: 'scale(1.05)' }}
-                                    priority
-                                />
-                            </Box>
-                            <Box sx={{ mt: 3, textAlign: 'center' }}>
-
-                                <Typography variant="body2" sx={{ fontSize: '0.875rem', color: '#4B5563', mt: 0.5 }}>
-                                    {galleryItems[1].description}
-                                </Typography>
-                            </Box>
-                        </Box>
-
-                        {/* Bottom Landscape */}
-                        <Box>
-                            <Box
-                                sx={{
-                                    position: 'relative',
-                                    width: '100%',
-                                    aspectRatio: '16/9',
-                                    borderRadius: '12px',
-                                    overflow: 'hidden',
-                                }}
-                            >
-                                <Image
-                                    src={galleryItems[2].image}
-                                    alt={galleryItems[2].title}
-                                    fill
-                                    style={{ objectFit: 'cover', transform: 'scale(1.05)' }}
-                                />
-                            </Box>
-                            <Box sx={{ mt: 3, textAlign: 'center' }}>
-                                <Typography variant="h6" sx={{ fontSize: '1.125rem', fontWeight: 'medium', color: '#111827' }}>
-                                    {galleryItems[2].title}
-                                </Typography>
-                                <Typography variant="body2" sx={{ fontSize: '0.875rem', color: '#4B5563', mt: 0.5 }}>
-                                    {galleryItems[2].description}
-                                </Typography>
-                            </Box>
-                        </Box>
-                    </Stack>
-                </Grid>
-            </Grid>
+           
+        
 
             <Box sx={{ textAlign: 'center', mt: 6, mb: 6 }}>
                 <Typography
@@ -217,19 +121,111 @@ const GallerySection: React.FC = () => {
             
             <Box component="main" sx={{ maxWidth: '100vw', overflowX: 'hidden', mt: 6, mb: 6 }}>
                 <AboutGroup review={sampleData.review} avatarGroups={sampleData.avatarGroups} />
-                <Wave />
+                <Wave size={10}/>
             </Box>
-        
-         
-          
-              
-
-            
-           
-         
             </Container>
         
     );
 };
 
 export default GallerySection;
+
+
+// <Grid container spacing={2} justifyContent="center">
+//     {/* Portrait Image (Left) */}
+//     <Grid item xs={12} md={6}>
+//         <Box sx={{ maxWidth: 350, mx: 'auto' }}>
+//             <Box
+//                 sx={{
+//                     position: 'relative',
+//                     width: '100%',
+//                     aspectRatio: '9/16',
+//                     borderRadius: '12px',
+//                     overflow: 'hidden',
+//                 }}
+//             >
+//                 <Image
+//                     src={galleryItems[0].image}
+//                     alt={galleryItems[0].title}
+//                     fill
+//                     style={{ objectFit: 'cover', transform: 'scale(1.05)' }}
+//                     priority
+//                 />
+//             </Box>
+//             <Box sx={{ mt: 3, textAlign: 'center' }}>
+//                 <Typography variant="body2" sx={{ fontSize: '0.875rem', color: '#4B5563', mt: 0.5 }}>
+//                     {galleryItems[0].description}
+//                 </Typography>
+//             </Box>
+//         </Box>
+//     </Grid>
+
+//     {/* Landscape Images (Right, Stacked) */}
+//     <Grid
+//         component="div"
+//         xs={12}
+//         md={6}
+//         sx={{
+//             display: 'flex',
+//             alignItems: 'center', // Vertically center the Stack
+//             justifyContent: 'center',
+//         }}
+//     >
+//         <Stack direction="column" spacing={2} sx={{ maxWidth: 350, mx: 'auto' }}>
+//             {/* Top Landscape */}
+//             <Box>
+//                 <Box
+//                     sx={{
+//                         position: 'relative',
+//                         width: '100%',
+//                         aspectRatio: '16/9',
+//                         borderRadius: '12px',
+//                         overflow: 'hidden',
+//                     }}
+//                 >
+//                     <Image
+//                         src={galleryItems[1].image}
+//                         alt={galleryItems[1].title}
+//                         fill
+//                         style={{ objectFit: 'cover', transform: 'scale(1.05)' }}
+//                         priority
+//                     />
+//                 </Box>
+//                 <Box sx={{ mt: 3, textAlign: 'center' }}>
+
+//                     <Typography variant="body2" sx={{ fontSize: '0.875rem', color: '#4B5563', mt: 0.5 }}>
+//                         {galleryItems[1].description}
+//                     </Typography>
+//                 </Box>
+//             </Box>
+
+//             {/* Bottom Landscape */}
+//             <Box>
+//                 <Box
+//                     sx={{
+//                         position: 'relative',
+//                         width: '100%',
+//                         aspectRatio: '16/9',
+//                         borderRadius: '12px',
+//                         overflow: 'hidden',
+//                     }}
+//                 >
+//                     <Image
+//                         src={galleryItems[2].image}
+//                         alt={galleryItems[2].title}
+//                         fill
+//                         style={{ objectFit: 'cover', transform: 'scale(1.05)' }}
+//                     />
+//                 </Box>
+//                 <Box sx={{ mt: 3, textAlign: 'center' }}>
+//                     <Typography variant="h6" sx={{ fontSize: '1.125rem', fontWeight: 'medium', color: '#111827' }}>
+//                         {galleryItems[2].title}
+//                     </Typography>
+//                     <Typography variant="body2" sx={{ fontSize: '0.875rem', color: '#4B5563', mt: 0.5 }}>
+//                         {galleryItems[2].description}
+//                     </Typography>
+//                 </Box>
+//             </Box>
+//         </Stack>
+//     </Grid>
+// </Grid> 
