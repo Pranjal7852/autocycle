@@ -264,10 +264,7 @@ export const feature18 = {
       title: 'Initial Consultation',
       title2: 'Let’s Understand Your Needs',
       description: "We begin by understanding your project's needs in our first call, where we refine your material requirements. During this conversation, we’ll ask questions to ensure we fully understand your application, volume, and delivery timelines.",
-      image: {
-        light: '/assets/images/graphics/default/admin-dashboard.png',
-        dark: '/assets/images/graphics/default/admin-dashboard-dark.png'
-      },
+      image: '/assets/images/graphics/default/admin1.png',
       list: [
         { primary: 'Discuss your material requirements and application context' },
         { primary: 'Clarify technical and performance expectations' },
@@ -280,7 +277,7 @@ export const feature18 = {
       title: 'List Your Requirements',
       title2: 'Tell Us What You Need',
       description: 'Once we’ve established the foundation, you’ll submit a detailed list of material specifications. This includes properties like strength, flexibility, color, and environmental concerns, which will help us pinpoint the best materials for your project.',
-      image: '/assets/images/graphics/default/admin-dashboard-3.png',
+      image: '/assets/images/graphics/default/admin2.png',
       list: [
         {
           primary: 'Submit material requirements with detailed specifications' },
@@ -294,7 +291,7 @@ export const feature18 = {
       title: 'Material Matching',
       title2: 'Finding the Perfect Match',
       description: 'Our platform evaluates available plastic materials that match your specifications. We identify the best-fit options based on performance, pricing, and sustainability to ensure the right material is sourced for your needs.',
-      image: '/assets/images/graphics/default/admin-dashboard-2.png',
+      image: '/assets/images/graphics/default/admin3.png',
       list: [
         { primary: 'Match specifications with available plastic materials' },
         { primary: 'Compare performance, pricing, and environmental impact' },
@@ -308,7 +305,7 @@ export const feature18 = {
       title: 'Connect & Close the Deal',
       title2: 'Seal the Deal & Move Forward',
       description: 'Once a suitable material match is found, we facilitate direct negotiation with the seller. After finalizing the terms and contract, the order is confirmed, ensuring timely and efficient delivery.',
-      image: '/assets/images/graphics/default/admin-dashboard.png',
+      image: '/assets/images/graphics/default/admin4.png',
       list: [
         { primary: 'Negotiate terms and pricing with the seller' },
         { primary: 'Finalize the material order and delivery details' },

@@ -36,19 +36,18 @@ const data = [
     title: 'Company',
     menu: [
       {
-        label: 'Why Phoenixcoded?',
+        label: "Autocycle's Solutions",
         link: {
-          href: 'https://blog.saasable.io/a-decade-of-expertise-the-phoenixcoded-story-and-why-you-should-trust-us',
-          ...linkProps
+          href: '/#solutions',...linkProps
         }
       },
       {
         label: 'About',
-        link: { href: 'https://saasable.io/about', ...linkProps }
+        link: { href: '/about', ...linkProps }
       },
       {
         label: 'Contact Us',
-        link: { href: '/contact', ...linkProps }
+        link: { href: '/#contact', ...linkProps }
       }
     ]
   },
@@ -112,19 +111,19 @@ const iconProps = { color: 'text.secondary' };
 
 const usefullLinks = [
   {
-    icon: <SvgIcon name="tabler-brand-figma" {...iconProps} />,
-    title: 'Figma Version 1.1.0',
-    href: 'https://www.figma.com/community/file/1425095061180549847'
+    icon: <SvgIcon name="tabler-world" {...iconProps} />,
+    title: 'Based in Munich, operating across Europe',
+    href: ''
   },
   {
-    icon: <SvgIcon name="tabler-route" {...iconProps} />,
-    title: 'React Material UI v7',
-    href: 'https://mui.com/material-ui/getting-started'
+    icon: <SvgIcon name="tabler-mail-forward" {...iconProps} />,
+    title: 'varvara.sharova@dpschool.io',
+    href: '"mailto:varvara.sharova@dpschool.io'
   },
   {
-    icon: <SvgIcon name="tabler-sparkles" {...iconProps} />,
-    title: 'Documentation',
-    href: DOCS_URL
+    icon: <SvgIcon name="tabler-phone-call" {...iconProps} />,
+    title: '+49 17641932352',
+    href: "tel:+4917641932352"
   }
 ];
 
@@ -138,7 +137,7 @@ export default function Footer7() {
         {process.env.NEXT_PUBLIC_VERSION}
       </Typography>
       <Typography variant="body2" sx={{ maxWidth: { sm: 280 } }}>
-        Explore the different versions of our {branding.brandName} template.
+        Accelerating the future of circular sourcing.
       </Typography>
     </Stack>
   );
