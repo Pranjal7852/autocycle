@@ -3,8 +3,8 @@ import SvgIcon from '@/components/SvgIcon';
 import { DOCS_URL } from '@/path';
 
 export const integration = {
-  headLine: 'Tailored for Specific Industries',
-  captionLine: 'From construction to cosmetics, explore how automotive recycled plastic can serve a variety of sectors, transitioning towards circular economy.',
+  headLine: 'Built for Circular Innovation Across Industries',
+  captionLine: "From construction to consumer tech, our network of high-quality post-use plastics serves industries looking to create smarter, more responsible products.",
   primaryBtn: {
     children: 'Documentation',
     startIcon: <SvgIcon name="tabler-help" color="background.default" />,
@@ -13,7 +13,7 @@ export const integration = {
     rel: 'noopener noreferrer'
   },
   tagList: [
-    { label: 'Automotivez' },
+    { label: 'Automotive' },
     { label: 'Building and Construction' },
     { label: 'Logistics & Packaging' },
     { label: 'Sports and Leisure' },

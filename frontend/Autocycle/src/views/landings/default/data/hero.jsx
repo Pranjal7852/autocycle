@@ -14,7 +14,7 @@ export const hero = {
         <Chip
           label={
             <Typography variant="caption" sx={{ color: 'primary.darker' }}>
-              ♻️ Recyling
+              ♻️ Potential
             </Typography>
           }
           sx={{ height: 24, bgcolor: 'primary.lighter', mr: -1, ml: 0.75, '& .MuiChip-label': { px: 1.25 } }}
@@ -22,10 +22,10 @@ export const hero = {
       </>
     )
   },
-  headLine: 'Catch today the material flows of tomorrow.',
-  captionLine: 'Bridging the Gap Between Your Sourcing Needs and OEM End-of-Life Products',
-  primaryBtn: { children: 'Our Solution', href: SECTION_PATH },
-  videoSrc: 'https://d2elhhoq00m1pj.cloudfront.net/saasable-intro.mp4',
+  headLine: 'Unlock the Potential of Second-Life Plastics.',
+  captionLine: 'We are helping your business meet sustainability goals with materials that are ready to be transformed.',
+  primaryBtn: { children: 'Our Solution', href: "/#solution" },
+  videoSrc: '/assets/videos/test2.mp4',
   videoThumbnail: '/assets/videos/thumbnails/intro-thumbnail.png',
   listData: [
     { image: '/assets/images/shared/react.svg', title: 'React 18' },

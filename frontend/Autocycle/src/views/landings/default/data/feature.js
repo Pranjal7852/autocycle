@@ -72,41 +72,35 @@ export const feature5 = {
 };
 
 export const feature20 = {
-  heading: 'Consulting Service Tailored to your Needs',
+  heading: 'Service Tailored to your Needs',
   caption: 'Interested how we can fix your future sourcing?',
-  actionBtn: { children: "Let's Talk", href: BUY_NOW_URL, ...linkProps },
-  secondaryBtn: { children: 'Our Solutions', href: SECTION_PATH },
+  actionBtn: { children: "Let's Talk", href: "/#contact" },
+  secondaryBtn: { children: 'Our Solutions', href: "/#solution" },
   features: [
     {
       icon: 'tabler-accessible',
-      title: 'Stable Prices',
-      content: 'We offer stable, transparent pricing to give you the confidence to plan your budget without any unexpected costs.'
-    },
+      title: 'Reliable Pricing',
+      content: "We offer consistent, transparent pricing so you can plan with confidence — no hidden costs, no surprises."},
     {
       icon: 'tabler-icons',
-      title: 'Clear Plannability',
-      content: 'With well-defined timelines and measurable milestones, our process ensures clear plannability for every project phase.'
-    },
+      title: 'Planning Made Easy',
+      content: "Structured timelines and clear milestones make your sourcing process predictable and easy to manage — from first contact to delivery." },
     {
       icon: 'tabler-stack-2',
-      title: 'Ensured Quality, Quantity',
-      content: 'We guarantee both the high quality and the required quantity of deliverables, ensuring our solutions exceed your expectations.'
-    },
+      title: 'Quality You Can Count On',
+      content: "Every material we match comes with verified origin and consistent properties — ensuring it meets your standards in both performance and volume."  },
     {
       icon: 'tabler-rocket',
-      title: 'Ready at your time',
-      content: 'Our team is flexible and ready to assist you on your schedule, providing prompt support exactly when you need it.'
-    },
+      title: 'Flexible Timing',
+      content: "We adapt to your schedule. Whether you’re ready now or planning ahead, our team is here when you need us" },
     {
       icon: 'tabler-help',
-      title: 'Clear Traceability',
-      content: 'We maintain comprehensive traceability throughout our process so you can always track your project’s progress from start to finish.'
-    },
+      title: 'Full Traceability',
+      content: "Track every step of your project. From sourcing to shipment, we ensure transparent documentation and a clear chain of custody."  },
     {
       icon: 'tabler-refresh',
-      title: 'Advertisement Value',
-      content: 'Our strategies not only enhance operational efficiency but also increase your brand’s advertisement value, boosting its market visibility.'
-    }
+      title: 'Added Brand Value',
+      content: "Show your commitment to circularity with traceable sourcing. It’s more than compliance — it’s a story your brand can proudly tell." }
   ]
 };
 
@@ -275,10 +269,10 @@ export const feature18 = {
         dark: '/assets/images/graphics/default/admin-dashboard-dark.png'
       },
       list: [
-        { primary: 'Discuss project scope and material requirements' },
-        { primary: 'Clarify the usage and performance needs' },
-        { primary: 'Understand volume and delivery timelines' },
-        { primary: 'Address any initial questions or concerns' }
+        { primary: 'Discuss your material requirements and application context' },
+        { primary: 'Clarify technical and performance expectations' },
+        { primary: 'Define volume, location, and timing needs' },
+        { primary: 'Address early-stage questions or uncertainties' }
       ],
     },
     {
