@@ -1,0 +1,82 @@
+analyze_brand_task:
+  description: >
+    Analyze {brand}'s market positioning, values, and characteristics to determine its category and potential for upcycling partnerships.
+    Consider:
+    1. Brand's market segment and positioning
+    2. Core values and brand identity
+    3. Target audience and demographics
+    4. Sustainability initiatives and goals
+    5. Design aesthetic and product categories
+    6. Innovation capabilities and future vision
+
+    Use the SearchTool to gather comprehensive information about the brand.
+    The current year is {current_year}.
+  expected_output: >
+    A JSON formatted analysis containing:
+    1. brand_category (luxury, sport, tech, automotive, consumer, or other)
+    2. brand_characteristics:
+       - values (list of core brand values)
+       - focus_areas (list of key business areas)
+       - target_audience (list of audience characteristics)
+    3. sustainability_initiatives (list of current and planned initiatives)
+    4. market_positioning (detailed description of brand's market position)
+    5. partnership_potential (analysis of potential for upcycling partnerships)
+  agent: brand_analyst
+
+match_industries_task:
+  description: >
+    Using the brand analysis from analyze_brand_task, identify at least five real brands from diverse industries 
+    that could use the seller's plastic ({plastic_type}) for upcycling, with a focus on brands that align with {brand}'s specific characteristics.
+    
+    Consider {brand}'s:
+    1. Market positioning (from brand analysis)
+    2. Brand values (from brand analysis)
+    3. Target audience and demographics (from brand analysis)
+    4. Current sustainability initiatives (from brand analysis)
+    5. Design aesthetic and product categories (from brand analysis)
+
+    Provide detailed reasoning for each match, explaining how the potential partnership aligns with {brand}'s specific characteristics and values.
+    Use the IndustryMatchTool to research compatible brands across varied sectors.
+    The current year is {current_year}.
+  expected_output: >
+    A JSON formatted list of at least five brand matches, each providing:
+    1. brand
+    2. industry
+    3. reason (detailed explanation of potential partnership alignment with {brand}'s specific characteristics)
+    4. brand_value_alignment (how the match aligns with {brand}'s core values)
+    5. market_synergy (potential market opportunities)
+  agent: industry_matchmaker
+
+generate_creative_pitches_task:
+  description: >
+    Generate at least five innovative product ideas for upcycling {brand}'s {plastic_type}, each tailored to a specific brand from the match_industries_task.
+    
+    For each idea, consider:
+    1. {brand}'s specific market positioning and brand values (from brand analysis)
+    2. The target brand's industry and product categories
+    3. Current market trends and consumer preferences
+    4. Sustainability goals and initiatives of both brands
+    5. Potential for premium positioning and market differentiation
+
+    Each pitch should include:
+    - A detailed product concept (150-200 words)
+    - How it leverages {brand}'s specific brand equity
+    - Market positioning and target audience
+    - Sustainability impact and innovation aspects
+    - Potential for brand collaboration and co-marketing
+
+    Combine these ideas with the brand matches into a single JSON output.
+    Use the SearchTool to validate feasibility and find examples.
+    The current year is {current_year}.
+  expected_output: >
+    A JSON formatted object containing:
+    1. potential_brands: List of at least five brand matches (from match_industries_task)
+    2. creative_ideas: List of at least five product ideas, each with:
+       - product_name
+       - target_brand
+       - pitch (detailed concept aligned with {brand}'s specific characteristics)
+       - brand_value_alignment
+       - market_opportunity
+       - sustainability_impact
+       - examples (similar products or collaborations)
+  agent: creative_pitch_generator
