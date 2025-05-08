@@ -8,6 +8,8 @@ from crew import PlasticReuseCrew
 from dotenv import load_dotenv
 
 load_dotenv()
+# import os
+# print("Key:", os.getenv("OPENAI_API_KEY"))
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 # This main file is intended to be a way for you to run your
@@ -22,8 +24,8 @@ def run():
     inputs = {
         'current_year': str(datetime.now().year),
         'brand': 'BMW',
-        'plastic_type': 'PCABS',
-        'reuse_context': 'upcycling'
+        'plastic_type': 'PP',
+        'brand location': 'Europe',
     }
     
     try:

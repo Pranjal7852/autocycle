@@ -6,6 +6,10 @@ import json
 import logging
 import re
 import random
+import openai
+from openai import OpenAIError
+from crewai_tools import DallETool
+
 # Initialize logging
 logging.basicConfig(level=logging.DEBUG)
 
@@ -368,8 +372,33 @@ class IndustryMatchTool(BaseTool):
         # Async version
         return self._run(input_data)
 
+# class ImageGeneratorTool(DALLETool):
+#     name: str = "ImageGeneratorTool"
+#     description: str = "Generates an image based on the product pitch using OpenAI's DALL·E model."
+
+#     async def _run(self, pitch: str) -> str:
+#         """
+#         Generates an image based on the product pitch using OpenAI's DALL·E model.
+#         Returns a URL to the generated image.
+#         """
+#         try:
+#             # Call to DALL·E model for image generation (correct method)
+#             response = await openai.Image.create(
+#                 model="dall-e-3",  # Ensure the correct model is specified
+#                 prompt=pitch,
+#                 n=1,
+#                 size="720x720",  # You can adjust the size as needed (e.g., 1024x1024)
+#             )
+            
+#             # Extract the URL of the generated image
+#             image_url = response['data'][0]['url']
+#             return image_url
+#         except OpenAIError as e:
+#             return f"Image generation failed: {str(e)}"
+
 # Instantiate tools
 brand_research_tool = BrandResearchTool()
 industry_compatibility_tool = IndustryCompatibilityTool()
 market_rates_tool = MarketRatesTool()
 industry_match_tool = IndustryMatchTool()
+image_generator_tool = DallETool()

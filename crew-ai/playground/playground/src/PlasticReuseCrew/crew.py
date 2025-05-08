@@ -2,14 +2,14 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from typing import List
 import json
-
-try:
-    from tools.tools import search_tool, industry_match_tool
-    print("Successfully imported tools from tools.tools")
-except ImportError:
-    print("Warning: Actual tools not found, using dummy tool placeholders.")
-    search_tool = "dummy_search_tool"
-    industry_match_tool = "dummy_industry_match_tool"
+from tools.tools import search_tool, industry_match_tool, image_generator_tool
+# try:
+#     from tools.tools import search_tool, industry_match_tool
+#     print("Successfully imported tools from tools.tools")
+# except ImportError:
+#     print("Warning: Actual tools not found, using dummy tool placeholders.")
+#     search_tool = "dummy_search_tool"
+#     industry_match_tool = "dummy_industry_match_tool"
 
 @CrewBase
 class PlasticReuseCrew():
@@ -41,6 +41,15 @@ class PlasticReuseCrew():
             verbose=True,
             allow_delegation=True
         )
+    
+    @agent
+    def image_generator(self) -> Agent:
+        return Agent(
+            config=self.agents_config['image_generator'],
+            tools=[image_generator_tool],
+            verbose=True,
+            allow_delegation=False
+        )
 
     @task
     def analyze_brand_task(self) -> Task:
@@ -66,6 +75,16 @@ class PlasticReuseCrew():
             agent=self.creative_pitch_generator(),
             output_file='plastic_reuse_analysis.json',  # Final combined output
             context=[self.analyze_brand_task(), self.match_industries_task()]  # Use both analyses as context
+        )
+    
+    @task
+    def generate_image_task(self) -> Task:
+        """Generates an image from a product pitch and integrates with the creative pitch task."""
+        return Task(
+            config=self.tasks_config['generate_image_task'],
+            agent=self.image_generator(),
+            output_file='generated_image.json',
+            context=[self.generate_creative_pitches_task()]  
         )
 
     @crew

@@ -6,7 +6,7 @@ class KeywordSpiderSpider(scrapy.Spider):
     allowed_domains = ["www.scrapmonster.com"]
     start_urls = ["https://www.scrapmonster.com/companies"]
 
-keywords = ["python", "scrapy", "web scraping"]  # Define your keywords
+keywords = ["python", "PC-ABS", "plastic"]  # Define your keywords
 
 def parse(self, response):
     for keyword in self.keywords:

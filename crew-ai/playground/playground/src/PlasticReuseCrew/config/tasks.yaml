@@ -80,3 +80,36 @@ generate_creative_pitches_task:
        - sustainability_impact
        - examples (similar products or collaborations)
   agent: creative_pitch_generator
+
+generate_image_task:
+  description: >
+    Create a high-quality digital render of a modern storage cabinet called BESTÅ EcoFrame. The cabinet is designed using 85% post-consumer ABS plastic upcycled from BMW dashboards. It should reflect a fusion of BMW’s engineered luxury and IKEA’s minimalist Scandinavian aesthetic. The cabinet features a light oak wood frame and matte black textured front panels. Place the cabinet in a softly lit modern living room with neutral tones (beige walls, wooden flooring, minimalist decor). Include a simple vase and books on top to suggest everyday use. Add clear text: ‘BESTÅ EcoFrame – Made from upcycled ABS from BMW dashboards containing 85% post-consumer automotive plastic.’
+    # Generate a Dell-E image, visually compelling promotional images for each upcycled product concept provided by the creative_pitch_generator. These images should reflect the design language, aesthetic values, and premium positioning of both the source brand ({brand}) and the matched target brand.
+
+    #   - For each product concept, your deliverables should include:
+    #   - A primary product render or concept illustration
+    #   - Optional lifestyle/application image showing the product in context
+    #   - Aesthetic aligned with both brands' design languages
+    #   - Use of color schemes, materials, and textures relevant to the product's origin (upcycled {plastic_type})
+    #   - Visual storytelling that highlights sustainability, innovation, and brand synergy
+
+    # Consider:
+    #   {brand}’s core visual identity and materials heritage
+    #   The target brand’s industry-specific styling and consumer expectations
+    #   Visual trends from {current_year} in eco-product and luxury branding
+    #   The product pitch provided (product_name, brand_value_alignment, sustainability_impact, etc.)
+    # Make sure you use the tools provided.
+  expected_output: >
+    image url
+  #   A JSON formatted list of at least five image concepts, each containing:
+
+  #   1. image_name (creative name or theme)
+  #   2. brand (target brand)
+  #   3. concept (detailed description of the visual, including the aesthetic, colors, and design elements)
+  #   4. target_audience (how the visual appeals to the brand’s target demographic)
+  #   5. design_innovation (how the visual stands out in the current market or trends)
+  #   6. sustainability_alignment (how the visual concept ties into the brand's sustainability initiatives)
+  #   7. potential_uses (how the visual concept can be applied to different marketing materials, product packaging, or promotions)
+  #   8. image_url (URL of the generated image)
+
+  agent: image_generator
