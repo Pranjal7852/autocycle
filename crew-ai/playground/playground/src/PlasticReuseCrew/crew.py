@@ -37,7 +37,7 @@ class PlasticReuseCrew():
     def creative_pitch_generator(self) -> Agent:
         return Agent(
             config=self.agents_config['creative_pitch_generator'],
-            tools=[search_tool],
+            tools=[industry_match_tool, search_tool],
             verbose=True,
             allow_delegation=True
         )

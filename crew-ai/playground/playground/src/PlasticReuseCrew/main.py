@@ -43,9 +43,13 @@ if __name__ == "__main__":
 #     Train the crew for a given number of iterations.
 #     """
 #     inputs = {
-#         "topic": "AI LLMs",
-#         'current_year': str(datetime.now().year)
+    
+#         'current_year': str(datetime.now().year),
+#         'brand': 'BMW',
+#         'plastic_type': 'PP',
+#         'brand location': 'Europe',
 #     }
+    
 #     try:
 #         Playground().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
 
@@ -67,8 +71,11 @@ if __name__ == "__main__":
 #     Test the crew execution and returns the results.
 #     """
 #     inputs = {
-#         "topic": "AI LLMs",
-#         "current_year": str(datetime.now().year)
+    
+#         'current_year': str(datetime.now().year),
+#         'brand': 'BMW',
+#         'plastic_type': 'PP',
+#         'brand location': 'Europe',
 #     }
     
 #     try:
