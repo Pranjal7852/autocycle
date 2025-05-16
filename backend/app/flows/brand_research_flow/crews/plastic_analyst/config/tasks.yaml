@@ -1,0 +1,24 @@
+analyze_brand_task:
+  description: >
+    Analyze {brand}'s market positioning, values, and characteristics to determine its category and potential for upcycling partnerships.
+    Consider:
+    1. Brand's market segment and positioning
+    2. Core values and brand identity
+    3. Target audience and demographics
+    4. Sustainability initiatives and goals
+    5. Design aesthetic and product categories
+    6. Innovation capabilities and future vision
+
+    Use the SearchTool to gather comprehensive information about the brand.
+    The current year is {current_year}.
+  expected_output: >
+    A JSON formatted analysis containing:
+    1. brand_category (luxury, sport, tech, automotive, consumer, or other)
+    2. brand_characteristics:
+       - values (list of core brand values)
+       - focus_areas (list of key business areas)
+       - target_audience (list of audience characteristics)
+    3. sustainability_initiatives (list of current and planned initiatives)
+    4. market_positioning (detailed description of brand's market position)
+    5. partnership_potential (analysis of potential for upcycling partnerships)
+  agent: brand_analyst

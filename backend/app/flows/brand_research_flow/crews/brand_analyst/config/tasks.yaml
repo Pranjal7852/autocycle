@@ -1,0 +1,81 @@
+analyze_target_brand:
+  description: >
+    Analyze the target brand, '{brand}', focusing on its market positioning, core values, brand identity, target audience,
+    sustainability initiatives, design aesthetic, product categories, and innovation capabilities.
+    The primary goal is to understand the brand's profile thoroughly to assess its suitability and potential angles for
+    upcycling-focused partnerships. Use the SearchTool to gather comprehensive and up-to-date information.
+    The current year is 2025.
+  expected_output: >
+    A JSON formatted analysis for '{brand}' containing:
+    1. brand_category (e.g., luxury, sport, tech, automotive, consumer goods, fashion, lifestyle, other)
+    2. brand_characteristics:
+       - values (list of core brand values and mission statements)
+       - focus_areas (list of key business areas, product lines, or services)
+       - target_audience (detailed description including demographics, psychographics, and consumer behavior)
+    3. sustainability_initiatives (list of current and publicly stated future initiatives, including any circular economy efforts)
+    4. market_positioning (detailed description of brand's current market position, key competitors, and unique selling propositions)
+    5. design_aesthetic (description of the brand's visual style, product design language)
+    6. partnership_potential_indicators (analysis of factors suggesting openness or suitability for upcycling partnerships, e.g., existing eco-friendly lines, innovation hubs, statements on material use)
+  agent: brand_researcher
+
+analyze_plastic_material:
+  description: >
+    Conduct a thorough analysis of the specified plastic type: '{plastic_type}'.
+    Investigate its chemical properties, common industrial and consumer applications, typical lifecycle, and current recycling challenges and successes.
+    Crucially, identify and detail innovative upcycling possibilities and potential new product applications for this material, especially those
+    that could appeal to consumer brands. Use the SearchTool to gather scientific data, industry reports, and case studies on upcycling '{plastic_type}'.
+    The current year is 2025.
+  expected_output: >
+    A JSON formatted report on '{plastic_type}' detailing:
+    1. plastic_identity:
+       - type_name (e.g., PET, HDPE, LDPE, PP, PS, PVC, PLA, ABS, Polycarbonate, etc.)
+       - common_names_and_grades (any common trade names or specific grades relevant to upcycling)
+    2. key_properties:
+       - physical (e.g., density, tensile strength, flexibility, melting point, colorability)
+       - chemical (e.g., resistance to solvents, UV stability)
+    3. common_original_uses (list of typical products made from this virgin plastic)
+    4. recyclability_profile:
+       - current_recycling_methods (brief overview)
+       - common_challenges_in_recycling (e.g., contamination, degradation, collection rates)
+       - typical_recycled_products (what it's commonly downcycled or recycled into)
+    5. upcycling_opportunities:
+       - innovative_reuse_concepts (list of creative ideas for new products or materials from upcycled '{plastic_type}')
+       - potential_enhancements (how upcycling could improve properties or create unique aesthetics)
+       - example_upcycled_products (if any existing examples can be found)
+  agent: plastic_analyst
+
+identify_collaboration_opportunities:
+  description: >
+    Based on the detailed analysis of the target brand '{brand}' and the properties and upcycling potential of '{plastic_type}',
+    your primary objective is to identify and list the names of 5 distinct brands that would be strong potential collaboration partners for '{brand}'.
+    For each of these 5 proposed collaborating brands, provide a supporting rationale explaining the strategic fit (brand image, target audience, values,
+    innovative use of upcycled '{plastic_type}') and suggest a specific co-branded product concept.
+    Use the SearchTool to research and identify suitable collaborating brands that are not '{brand}'.
+    The current year is 2025.
+  expected_output: >
+    A JSON formatted report. The top-level key 'top_5_collaborating_brand_names' should list the 5 identified brand names directly.
+    The 'collaboration_proposals' array should provide detailed supporting information for each of these 5 brands.
+    {
+      "target_brand_profile_summary": "Key highlights from the '{brand}' analysis relevant to collaborations.",
+      "plastic_material_upcycling_summary": "Key highlights from the '{plastic_type}' analysis relevant to product innovation.",
+      "top_5_collaborating_brand_names": [
+        "Name of Collaborating Brand 1",
+        "Name of Collaborating Brand 2",
+        "Name of Collaborating Brand 3",
+        "Name of Collaborating Brand 4",
+        "Name of Collaborating Brand 5"
+      ],
+      "collaboration_proposals": [
+        {
+          "proposed_collaborating_brand": "Name of Collaborating Brand 1",
+          "collaboration_rationale": "Detailed explanation of why this brand is a good fit (alignment of values, target audience, market position, complementarity with '{brand}', potential for innovative use of '{plastic_type}').",
+          "suggested_product_concept": "Description of a potential co-branded product using upcycled '{plastic_type}' (e.g., 'Limited edition sneakers with soles made from upcycled {plastic_type} pellets, co-branded by {brand} and Collaborating Brand 1, highlighting sustainable fashion.').",
+          "synergy_with_target_brand": "How this collaboration would benefit '{brand}'.",
+          "synergy_with_plastic_upcycling": "How this collaboration showcases innovative use of '{plastic_type}'."
+        }
+      ]
+    }
+  agent: collaboration_strategist
+  context:
+    - analyze_target_brand
+    - analyze_plastic_material

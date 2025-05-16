@@ -1,0 +1,32 @@
+generate_creative_pitches_task:
+  description: >
+    Generate at least five innovative product ideas for upcycling {brand}'s {material}, each tailored to a specific brand from the match_industries_task.
+    
+    For each idea, consider:
+    1. {brand}'s specific market positioning and brand values (from brand analysis)
+    2. The target brand's industry and product categories
+    3. Current market trends and consumer preferences
+    4. Sustainability goals and initiatives of both brands
+    5. Potential for premium positioning and market differentiation
+
+    Each pitch should include:
+    - One detailed product concept (150-200 words)
+    - How it leverages {brand}'s specific brand equity
+    - Market positioning and target audience
+    - Sustainability impact and innovation aspects
+    - Potential for brand collaboration and co-marketing
+
+    Combine these ideas with the brand matches into a single JSON output.
+    Use the SearchTool to validate feasibility and find examples.
+    
+  expected_output: >
+    A JSON formatted object containing:
+    - product_name
+    - target_brand
+    - product_concept (detailed concept aligned with {brand}'s specific characteristics)
+    - brand_value_alignment
+    - market_opportunity
+    - sustainability_impact
+    - examples (similar products or collaborations)
+    - a promotional tagline for the product
+  agent: creative_pitch_generator
