@@ -4,7 +4,7 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict
 from crewai_tools import SerperDevTool
 from app.utils.crew_logger import CrewLogger
-import yaml
+from pydantic import BaseModel
 import os
 import logging
 
@@ -15,88 +15,100 @@ log_file = os.path.join(log_dir, 'crew_execution.log')
 
 logger = CrewLogger(
     log_file=log_file,
-    log_level=logging.DEBUG,  # Set to DEBUG for more detailed logging
+    log_level=logging.DEBUG,
     console_output=True
 )
 
+# Consistent structured output model for brand analysis
+class BrandProfile(BaseModel):
+    name: str
+    industry: str
+    main_products: List[str]
+    sustainability_initiatives: List[str]
+    plastic_materials_used: List[str]
+    past_collaborations: List[str]
+    operational_regions: List[str]
+
 @CrewBase
-class BrandAnalystCrew():
-    """Brand Analysis crew"""
-    
+class BrandAnalystCrew:
+    """Crew for analyzing brand details and sustainability collaborations."""
+
     agents: List[BaseAgent]
     tasks: List[Task]
-
-    def __init__(self):
-        self.logger = logger
-        self.config_dir = os.path.join(os.path.dirname(__file__), 'config')
-        try:
-            self.agents_config = self._load_yaml_config('agents.yaml')
-            self.tasks_config = self._load_yaml_config('tasks.yaml')
-            self.logger.logger.info("Successfully loaded configuration files")
-        except Exception as e:
-            self.logger.logger.error(f"Error loading configuration files: {str(e)}")
-            raise
-
-    def _load_yaml_config(self, filename: str) -> dict:
-        config_path = os.path.join(self.config_dir, filename)
-        try:
-            with open(config_path, 'r') as f:
-                config = yaml.safe_load(f)
-                if not config:
-                    raise ValueError(f"Empty configuration in {filename}")
-                self.logger.logger.debug(f"Loaded config from {filename}: {config}")
-                return config
-        except Exception as e:
-            self.logger.logger.error(f"Error loading {filename}: {str(e)}")
-            raise
 
     @agent
     def brand_researcher(self) -> Agent:
         try:
-            agent_config = self.agents_config['brand_researcher']
-            self.logger.logger.info("Creating brand researcher agent with config")
+            logger.logger.info("Creating Sustainability Brand Researcher agent")
             return Agent(
-                config=agent_config,  # type: ignore[index]
+                role="Sustainability Brand Researcher",
+                goal="Identify a brand's plastic use, sustainability initiatives, and regional operations with minimal queries",
+                backstory="""You are an expert in brand sustainability analysis, capable of extracting valuable insights
+                from a single comprehensive search. Your research helps identify potential collaboration opportunities
+                between brands based on material usage and geographic reach.""",
+                tools=[SerperDevTool()],
                 verbose=True,
-                tools=[SerperDevTool()]
+                allow_delegation=False
             )
         except Exception as e:
-            self.logger.logger.error(f"Error creating brand researcher agent: {str(e)}")
+            logger.logger.error(f"Error creating Brand Researcher agent: {str(e)}")
             raise
 
     @task
-    def analyze_target_brant(self) -> Task:
+    def analyze_target_brand(self) -> Task:
         try:
-            task_config = self.tasks_config['analyze_target_brand']
-            self.logger.logger.info("Creating analyze target brand task with config")
+            logger.logger.info("Creating analyze_target_brand task")
             return Task(
-                config=task_config  # type: ignore[index]
+                description="""
+                Research the brand '{brand}' using ONLY ONE smart search query:
+                Example: "{brand} sustainability initiatives plastic usage collaborations manufacturing regions"
+
+                Extract from the first result only:
+                1. Brand industry and core product categories
+                2. Any plastic materials the brand uses or recycles
+                3. Any past or current sustainability collaborations
+                4. Their operational or manufacturing regions
+                
+                If 'location' is given, prefer sources relevant to that region.
+                
+                DO NOT perform more than one query. DO NOT infer data.
+                """,
+                agent=self.brand_researcher(),
+                expected_output="A JSON string representing a BrandProfile with the brand's industry, products, sustainability initiatives, plastic materials, collaborations, and regions.",
+                output_pydantic=BrandProfile
             )
         except Exception as e:
-            self.logger.logger.error(f"Error creating analyze target brand task: {str(e)}")
+            logger.logger.error(f"Error creating analyze_target_brand task: {str(e)}")
             raise
 
     @crew
     def crew(self) -> Crew:
-        """Creates the Brand analysis Crew"""
         return Crew(
-            agents=self.agents,  # Automatically created by the @agent decorator
-            tasks=self.tasks,  # Automatically created by the @task decorator
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            memory=True
+            memory=False,
         )
 
-    async def kickoff(self, input: Dict) -> Dict:
-        """Run the brand analysis crew"""
+    async def kickoff(self, input_data: Dict) -> Dict:
         try:
-            self.logger.logger.info(f"Starting crew kickoff with input: {input}")
+            if not isinstance(input_data, dict):
+                raise ValueError("Input must be a dictionary")
+            if "brand" not in input_data:
+                raise ValueError("Input dictionary must contain a 'brand' key")
+            if not isinstance(input_data["brand"], str) or not input_data["brand"].strip():
+                raise ValueError("'brand' must be a non-empty string")
+
+            logger.logger.info(f"Starting BrandAnalystCrew with input: {input_data}")
             crew_instance = self.crew()
-            self.logger.logger.info("Crew instance created")
-            result = await crew_instance.kickoff_async(inputs=input)
-            self.logger.logger.info(f"Crew execution completed with result: {result}")
+            logger.logger.info("Crew instance created")
+            result = await crew_instance.kickoff_async(inputs=input_data)
+            logger.logger.info(f"Crew execution completed with result: {result}")
             return result
-        except Exception as e:
-            self.logger.logger.error(f"Error in brand analysis: {str(e)}")
+        except ValueError as ve:
+            logger.logger.error(f"Input validation error: {str(ve)}")
             raise
-        
+        except Exception as e:
+            logger.logger.error(f"Error in brand analysis: {str(e)}")
+            raise

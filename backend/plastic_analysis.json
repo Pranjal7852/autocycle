@@ -1,3 +1,4 @@
+```json
 {
     "material_composition": {
         "name": "Polyethylene Terephthalate (PET)",
@@ -16,16 +17,17 @@
         "sustainability_score": 4.5,
         "degradation_time": "Up to 450 years in natural environments",
         "environmental_concerns": [
-            "Production contributes to significant greenhouse gas emissions",
-            "The synthesis process involves toxic petrochemicals",
-            "Limited biodegradability leads to persistent plastic pollution",
-            "Potential for leaching harmful chemicals into the environment during degradation"
+            "Production contributes to significant greenhouse gas emissions.",
+            "The synthesis process involves toxic petrochemicals.",
+            "Limited biodegradability leads to persistent plastic pollution.",
+            "Potential for leaching harmful chemicals into the environment during degradation.",
+            "PET bottles generate more than 100 times the toxic emissions to air and water compared to glass."
         ]
     },
     "applications": [
-        "Beverage bottles",
+        "Beverage bottles (approximately 70% of PET usage)",
         "Food packaging (containers and wrappers)",
-        "Textiles (used in polyester fibers and clothing)",
+        "Textiles (used in polyester fibers for clothing and carpets)",
         "Construction materials (insulation, roofing sheets)",
         "Carpet fibers",
         "3D printing filament"
@@ -35,13 +37,13 @@
         "methods": [
             "Mechanical recycling (shredding, melting, and remolding)",
             "Chemical recycling (depolymerization to monomers)",
-            "Enzymatic recycling (using enzymes to break down PET into its building blocks)"
+            "Enzymatic recycling (breaking down PET using enzymes)"
         ],
         "challenges": [
-            "Contamination of PET with other materials complicates recycling",
-            "Limited recycling infrastructure in certain regions",
-            "Degradation of material properties with repeated recycling cycles",
-            "Need for public education on proper recycling practices"
+            "Contamination of PET with other materials complicates recycling.",
+            "Limited recycling infrastructure in certain regions.",
+            "Degradation of material properties with repeated recycling cycles.",
+            "Need for public education on proper recycling practices."
         ]
     },
     "alternatives": [
@@ -67,3 +69,6 @@
         }
     ]
 }
+``` 
+
+This analysis comprehensively outlines Polyethylene Terephthalate (PET), giving insights into its chemical makeup, environmental implications, various applications, and the recycling process and challenges associated with it, along with sustainable alternatives.

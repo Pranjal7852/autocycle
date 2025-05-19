@@ -9,5 +9,4 @@ analyze_target_brand:
       "sustainability_highlights": "...",
       "collaboration_flags": ["eco-line", "open innovation", "public commitments"]
     }
-  search_query: "brand analysis {brand} values market segment sustainability collaboration"
   agent: brand_researcher

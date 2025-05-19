@@ -3,30 +3,46 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict
 from crewai_tools import SerperDevTool
+from pydantic import BaseModel
 from app.utils.crew_logger import CrewLogger
-import time
 
 logger = CrewLogger(log_file="crew_execution.log", console_output=True)
 
+# ---------------------------
+# ✅ Pydantic Output Model
+# ---------------------------
+
+class CollaborationRecommendation(BaseModel):
+    name: str
+    industry: str
+    rationale: str
+    product_concept: str
+
+class CollaborationOutput(BaseModel):
+    input_summary: Dict[str, str]
+    top_collaborating_brands: List[CollaborationRecommendation]
+
+
+# ---------------------------
+# 🚀 Crew Class
+# ---------------------------
+
 @CrewBase
 class BrandCollabsCrew():
-   
     agents: List[BaseAgent]
     tasks: List[Task]
 
     def __init__(self):
         self.logger = logger
-        
 
     @agent
     def collaboration_strategist(self) -> Agent:
         return Agent(
-            role="Sustainable Collaboration Innovator",
-            goal="Based on comprehensive analyses of a target brand '{brand}' and a specific plastic '{plastic_type}', identify and list 5 distinct brand names that are prime candidates for strategic collaboration to develop innovative products using the upcycled plastic. Provide supporting rationale for each.",
-            backstory="""You are a visionary strategist at the intersection of brand marketing, sustainable product development, and circular economy principles.
-            With a keen eye for market trends and consumer desire for eco-conscious products, you excel at forging unlikely yet powerful partnerships.
-            You can see the "big picture," connecting a brand's image and values with the tangible potential of a specific upcycled material to pinpoint
-            ideal collaboration partners. Your network and understanding of diverse industries allow you to identify and select the most promising brands for impactful co-creation.""",
+            role="Collaboration Strategist",
+            goal="Find strong brand collaboration matches using pattern recognition, not heavy research.",
+            backstory="""You are a strategic expert in sustainable brand partnerships.
+            You match brands with complementary missions and materials.
+            You prefer reasoning over searching, and only use one search if absolutely necessary.""",
             tools=[SerperDevTool()],
             verbose=False,
             allow_delegation=False
@@ -35,47 +51,67 @@ class BrandCollabsCrew():
     @task
     def identify_collaboration_opportunities(self) -> Task:
         return Task(
-            description="""Based on brand '{brand}' and plastic '{plastic_type}' profiles, identify 5 high-fit brand partners for collaboration. 
-            Use brand synergy, sustainability alignment, and upcycling creativity as criteria.
-            
-            Expected output format:
-            {
-                "summary": {
-                    "brand": "...",
-                    "plastic": "..."
-                },
-                "top_5_collaborating_brand_names": [...],
-                "collaboration_proposals": [
-                    {
-                        "brand": "...",
-                        "rationale": "...",
-                        "product_idea": "...",
-                        "synergy_score": 8.5
-                    }
-                ]
-            }""",
+            description="""You are given two data objects: brand_data and plastic_data.
+
+Use them to recommend 5 strong collaboration candidates.
+
+**DO NOT** search for the brand or plastic. Use what's provided.
+
+Search only once if you need new brands in this format:
+"sustainable brands [industry from brand_data] [location if available]"
+
+Look for:
+- Complementary industries (not direct competitors)
+- Brands with sustainability goals
+- Brands that might use the plastic type in their products
+
+Your final output must be structured and insightful.""",
             agent=self.collaboration_strategist(),
-            output_file='collaboration_opportunities.json'
+            expected_output="""Use this exact format:
+
+{
+  "input_summary": {
+    "brand": "Brief brand name and industry",
+    "plastic": "Plastic type and one key property"
+  },
+  "top_collaborating_brands": [
+    {
+      "name": "string",
+      "industry": "string",
+      "rationale": "Why this brand is a good match",
+      "product_concept": "Brief idea for a joint product"
+    }
+  ]
+}
+
+Return exactly 5 if confident, else fewer high-quality matches.
+""",
+            output_pydantic=CollaborationOutput
         )
 
     @crew
     def crew(self) -> Crew:
-        """Creates the Brand analysis Crew"""
         return Crew(
-            agents=self.agents,  # Automatically created by the @agent decorator
-            tasks=self.tasks,  # Automatically created by the @task decorator
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            memory=True
+            memory=False
         )
 
-    async def kickoff(self, input: Dict) -> Dict:
-        """Run the brand collaboration crew"""
+    async def kickoff(self, input: Dict) -> CollaborationOutput:
         try:
+            if not isinstance(input, dict):
+                raise ValueError("Input must be a dictionary")
+            if "brand_data" not in input or "plastic_data" not in input:
+                raise ValueError("Input must contain 'brand_data' and 'plastic_data'")
+
             crew_instance = self.crew()
             result = await crew_instance.kickoff_async(inputs=input)
-            return result
+
+            # Ensure it's converted to a validated Pydantic object
+            return CollaborationOutput.parse_obj(result)
+
         except Exception as e:
-            self.logger.error(f"Error in brand collaboration: {str(e)}")
+            self.logger.error(f"Error in brand collaboration crew: {str(e)}")
             raise
-        
