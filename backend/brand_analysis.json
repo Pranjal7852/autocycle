@@ -1,58 +1,16 @@
 {
-  "brand_category": "technology and consumer goods",
-  "brand_characteristics": {
-    "values": [
-      "innovation",
-      "sustainability",
-      "responsibility",
-      "trust",
-      "fairness",
-      "openness"
-    ],
-    "focus_areas": [
-      "Mobility solutions",
-      "Industrial technology",
-      "Consumer goods",
-      "Energy and building technology"
-    ],
-    "target_audience": {
-      "demographics": {
-        "age": "25-55",
-        "income": "middle to high income",
-        "profession": "technology enthusiasts, industrial professionals, homeowners"
-      },
-      "psychographics": [
-        "environmentally conscious consumers",
-        "innovators",
-        "tech-savvy individuals"
-      ],
-      "consumer_behavior": "seeks reliable, innovative, and efficient technology solutions; values sustainability and corporate responsibility."
-    }
-  },
-  "sustainability_initiatives": [
-    "commitment to reducing carbon emissions by 30% in absolute terms by 2030",
-    "focus on circular economy principles",
-    "embedding sustainable practices through the entire product life cycle"
+  "brand_category": "luxury automotive",
+  "key_values": [
+    "performance",
+    "innovation",
+    "sustainability",
+    "fairness and responsibility"
   ],
-  "market_positioning": {
-    "description": "Bosch operates as a leading global supplier of technology and services, emphasizing innovation and sustainability across its multiple sectors.",
-    "key_competitors": [
-      "Siemens",
-      "General Electric",
-      "Honeywell"
-    ],
-    "unique_selling_propositions": [
-      "high-quality, reliable products",
-      "commitment to sustainable practices",
-      "innovation-driven engineering"
-    ]
-  },
-  "design_aesthetic": {
-    "description": "Bosch products are characterized by clean design, user-centric functionality, and a modern aesthetic focused on efficiency and durability."
-  },
-  "partnership_potential_indicators": [
-    "active participation in sustainable product design and development",
-    "dedicated investment in eco-friendly technologies",
-    "focus on innovative material usage and circular economy methodologies"
+  "target_audience": "affluent individuals and luxury automobile enthusiasts who value high-performance vehicles, innovative technology, and sustainability.",
+  "sustainability_highlights": "Porsche is committed to responsible and resource-conserving use of materials, ensuring long-lasting lifecycle of their vehicles, with initiatives such as the CO₂-neutral Taycan model and adoption of circular economy practices.",
+  "collaboration_flags": [
+    "eco-line",
+    "open innovation",
+    "public commitments"
   ]
 }

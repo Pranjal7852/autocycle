@@ -1,69 +1,69 @@
 {
-    "plastic_identity": {
-        "type_name": "PP",
-        "common_names_and_grades": [
-            "Polypropylene",
-            "Homo-polypropylene",
-            "Copolymer polypropylene"
+    "material_composition": {
+        "name": "Polyethylene Terephthalate (PET)",
+        "chemical_structure": "C10H8O4",
+        "properties": [
+            "High tensile strength",
+            "Lightweight",
+            "Good thermal stability (operating range from -60°C to 220°C)",
+            "Excellent chemical resistance",
+            "Transparent and clear",
+            "Good gas barrier properties",
+            "Recyclable (near-infinite recyclability)"
         ]
     },
-    "key_properties": {
-        "physical": {
-            "density": "0.90-0.91 g/cm³",
-            "tensile_strength": "30-50 MPa",
-            "flexibility": "Standard flexibility with options for increased flexibility through modifications",
-            "melting_point": "160-170 °C",
-            "colorability": "Can be easily colored with dyes and pigments"
-        },
-        "chemical": {
-            "resistance_to_solvents": "Good resistance to acids, bases, and organic solvents",
-            "UV_stability": "Moderate UV stability; may require additives for enhanced stability"
-        }
+    "environmental_impact": {
+        "sustainability_score": 4.5,
+        "degradation_time": "Up to 450 years in natural environments",
+        "environmental_concerns": [
+            "Production contributes to significant greenhouse gas emissions",
+            "The synthesis process involves toxic petrochemicals",
+            "Limited biodegradability leads to persistent plastic pollution",
+            "Potential for leaching harmful chemicals into the environment during degradation"
+        ]
     },
-    "common_original_uses": [
-        "Food containers",
-        "Textiles",
-        "Automotive parts",
-        "Packaging materials",
-        "Medical supplies",
-        "Furniture"
+    "applications": [
+        "Beverage bottles",
+        "Food packaging (containers and wrappers)",
+        "Textiles (used in polyester fibers and clothing)",
+        "Construction materials (insulation, roofing sheets)",
+        "Carpet fibers",
+        "3D printing filament"
     ],
-    "recyclability_profile": {
-        "current_recycling_methods": "Mechanical recycling, chemical recycling, and energy recovery",
-        "common_challenges_in_recycling": [
-            "Contamination with other plastics leading to lower quality recyclates",
-            "Degradation of material properties with multiple recycling cycles",
-            "Low collection rates and limited consumer awareness about recycling options"
+    "recycling": {
+        "potential": "High - PET is one of the most recyclable plastics available today.",
+        "methods": [
+            "Mechanical recycling (shredding, melting, and remolding)",
+            "Chemical recycling (depolymerization to monomers)",
+            "Enzymatic recycling (using enzymes to break down PET into its building blocks)"
         ],
-        "typical_recycled_products": [
-            "Textile fibers",
-            "Automotive components",
-            "Construction materials"
+        "challenges": [
+            "Contamination of PET with other materials complicates recycling",
+            "Limited recycling infrastructure in certain regions",
+            "Degradation of material properties with repeated recycling cycles",
+            "Need for public education on proper recycling practices"
         ]
     },
-    "upcycling_opportunities": {
-        "innovative_reuse_concepts": [
-            "Transformation into durable outdoor furniture",
-            "Creation of unique art and design pieces",
-            "Production of building insulation materials"
-        ],
-        "potential_enhancements": [
-            "Improved mechanical strength through cross-linking",
-            "Enhanced thermal stability and resistance to impact",
-            "Novel aesthetics by incorporating recycled PP into composites"
-        ],
-        "example_upcycled_products": [
-            {
-                "name": "Recycled Plastic Street Furniture",
-                "description": "Benches made from upcycled PP that withstand outdoor conditions."
-            },
-            {
-                "name": "Fashion Accessories",
-                "description": "Items like bags and jewelry made from repurposed PP waste."
-            }
-        ]
-    }
+    "alternatives": [
+        {
+            "name": "Biodegradable Plastics (PLA)",
+            "description": "Polylactic Acid (PLA) is derived from renewable resources like corn starch, making it compostable under industrial conditions.",
+            "sustainability_advantage": "Does not contribute to long-term plastic pollution and is compostable, reducing waste impact."
+        },
+        {
+            "name": "Glass",
+            "description": "A durable, non-toxic material that can be recycled indefinitely without loss of quality.",
+            "sustainability_advantage": "Lower environmental impact when produced sustainably, as glass can be recycled infinitely."
+        },
+        {
+            "name": "Aluminum",
+            "description": "A lightweight and highly recyclable material used extensively for beverage cans and packaging.",
+            "sustainability_advantage": "Recycling aluminum saves about 90% of the energy required to produce new aluminum."
+        },
+        {
+            "name": "Hemp Plastic",
+            "description": "Plastics made from hemp are biodegradable and can decompose faster than conventional plastics.",
+            "sustainability_advantage": "Biodegradable and sourced from a renewable resource, reducing dependence on fossil fuels."
+        }
+    ]
 }
-```
-
-This JSON report succinctly encapsulates the characteristics and opportunities relating to polypropylene (PP) suitable for technology brands focused on sustainability and upcycling potentials.
