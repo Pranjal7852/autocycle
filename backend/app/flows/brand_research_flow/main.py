@@ -58,7 +58,8 @@ class ResearchFlow(Flow[BrandResearchState]):
         )
         self.state.brand_results = brand_data or {}
         similarity = self.state.brand_results.get("similarity_score", 0)
-        print(f"vector Search {similarity} for plastic { self.state.brand_name}")
+        print(f"vector Search {similarity} for { self.state.brand_name}")
+        print(f"vector Search { self.state.brand_name} for { self.state.brand_results}")
         if similarity < self.similarity_threshold:
             self.state.brand_research_needed = True
         else:
@@ -76,6 +77,7 @@ class ResearchFlow(Flow[BrandResearchState]):
         self.state.plastic_results = plastic_data or {}
         similarity = self.state.plastic_results.get("similarity_score", 0)
         print(f"vector Search {similarity} for plastic { self.state.plastic_type}")
+        print(f"vector Search { self.state.plastic_type} for { self.state.plastic_results}")
         if similarity < self.similarity_threshold:
             self.state.plastic_research_needed = True
         else:
@@ -104,8 +106,8 @@ class ResearchFlow(Flow[BrandResearchState]):
         
             self.state.brand_results = result
             self.state.brand_research_complete = True
-            asyncio.create_task(self.save_brand_to_db(result))
-            return {"brand_research": "completed", "brand_results": result}
+            asyncio.create_task(self.save_brand_to_db(result.to_dict()))
+            return "brand_research_complete"
         except Exception as e:
             logging.error(f"Error researching brand: {e}")
             return {"brand_research": "failed", "error": str(e)}
@@ -120,19 +122,11 @@ class ResearchFlow(Flow[BrandResearchState]):
             result = await self.plastic_research_crew.kickoff(input_data=input_data)
             self.state.plastic_results = result
             self.state.plastic_research_complete = True
-            asyncio.create_task(self.save_plastic_to_db(result))
-            return {"plastic_research": "completed", "plastic_results": result}
+            asyncio.create_task(self.save_plastic_to_db(result.to_dict()))
+            return "plastic_research_complete"
         except Exception as e:
             logging.error(f"Error researching plastic: {e}")
             return {"plastic_research": "failed", "error": str(e)}
-
-    @listen("brand_research_complete")
-    async def skip_brand_research(self):
-        return {"status": "brand research not needed"}
-
-    @listen("plastic_research_complete")
-    async def skip_plastic_research(self):
-        return {"status": "plastic research not needed"}
 
     async def save_brand_to_db(self, brand_data: Dict):
         try:
@@ -176,5 +170,6 @@ async def kickoff(brand_name: str = "", plastic_type: str = "", location: str = 
     flow.state.brand_name = brand_name
     flow.state.plastic_type = plastic_type
     flow.state.location = location
+    flow.plot("ResearchFlowPlot")
     logging.info(flow.state)
     return await flow.kickoff_async()

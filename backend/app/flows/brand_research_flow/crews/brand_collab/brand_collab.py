@@ -5,12 +5,19 @@ from typing import List, Dict
 from crewai_tools import SerperDevTool
 from pydantic import BaseModel
 from app.utils.crew_logger import CrewLogger
+import logging
+import os
 
-logger = CrewLogger(log_file="crew_execution.log", console_output=True)
+# Create logs directory if it doesn't exist
+log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(log_dir, exist_ok=True)
+log_file = os.path.join(log_dir, 'crew_execution.log')
 
-# ---------------------------
-# ✅ Pydantic Output Model
-# ---------------------------
+logger = CrewLogger(
+    log_file=log_file,
+    log_level=logging.DEBUG,
+    console_output=True
+)
 
 class CollaborationRecommendation(BaseModel):
     name: str
@@ -21,12 +28,6 @@ class CollaborationRecommendation(BaseModel):
 class CollaborationOutput(BaseModel):
     input_summary: Dict[str, str]
     top_collaborating_brands: List[CollaborationRecommendation]
-
-
-# ---------------------------
-# 🚀 Crew Class
-# ---------------------------
-
 @CrewBase
 class BrandCollabsCrew():
     agents: List[BaseAgent]
@@ -99,19 +100,20 @@ Return exactly 5 if confident, else fewer high-quality matches.
             memory=False
         )
 
-    async def kickoff(self, input: Dict) -> CollaborationOutput:
+    async def kickoff(self, input_data: Dict) -> CollaborationOutput:
         try:
-            if not isinstance(input, dict):
+            if not isinstance(input_data, dict):
                 raise ValueError("Input must be a dictionary")
-            if "brand_data" not in input or "plastic_data" not in input:
+            if "brand_data" not in input_data or "plastic_data" not in input_data:
                 raise ValueError("Input must contain 'brand_data' and 'plastic_data'")
-
+            logger.logger.info(f"Starting crew kickoff with input: {input_data}")
             crew_instance = self.crew()
-            result = await crew_instance.kickoff_async(inputs=input)
-
+            logger.logger.info("Crew instance created")
+            result = await crew_instance.kickoff_async(inputs=input_data)
+            logger.logger.info(f"Crew execution completed with result: {result}")
             # Ensure it's converted to a validated Pydantic object
-            return CollaborationOutput.parse_obj(result)
+            return result.to_dict()
 
         except Exception as e:
-            self.logger.error(f"Error in brand collaboration crew: {str(e)}")
+            logger.logger.error(f"Error in plastic analysis kickoff: {str(e)}")
             raise

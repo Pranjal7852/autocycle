@@ -36,58 +36,67 @@ class PostgresManager:
             with conn.cursor() as cur:
                 # Brands table updated to include industry
                 cur.execute("""
-                    CREATE TABLE IF NOT EXISTS brands (
-                        id SERIAL PRIMARY KEY,
-                        brand_id TEXT UNIQUE NOT NULL,
-                        name TEXT NOT NULL,
-                        industry TEXT,
-                        description TEXT,
-                        sustainability_score FLOAT,
-                        recycling_info TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
+                CREATE TABLE IF NOT EXISTS brands (
+                    id SERIAL PRIMARY KEY,
+                    brand_id TEXT UNIQUE NOT NULL,
+                    name TEXT NOT NULL,
+                    industry TEXT,
+                    main_products JSONB,
+                    sustainability_initiatives JSONB,
+                    plastic_materials_used JSONB,
+                    past_collaborations JSONB,
+                    operational_regions JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
 
                 # Plastic types table with JSONB fields for properties & applications
                 cur.execute("""
-                    CREATE TABLE IF NOT EXISTS plastic_types (
-                        id SERIAL PRIMARY KEY,
-                        plastic_id TEXT UNIQUE NOT NULL,
-                        type TEXT NOT NULL,
-                        description TEXT,
-                        properties JSONB,
-                        applications JSONB,
-                        recyclable BOOLEAN,
-                        biodegradable BOOLEAN,
-                        decomposition_time TEXT,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
+               CREATE TABLE IF NOT EXISTS plastic_types (
+                id SERIAL PRIMARY KEY,
+                plastic_id TEXT UNIQUE NOT NULL,
+                type TEXT NOT NULL,
+                properties JSONB,
+                applications JSONB,
+                environmental_impact TEXT,
+                recycling_potential TEXT,
+                regional_relevance TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
         finally:
             conn.close()
 
     def store_brand_data(self, brand_data: Dict) -> Optional[str]:
         conn = self._get_connection()
+        print("DEBUG - brand_data:", brand_data)
         try:
             with conn.cursor() as cur:
                 cur.execute("""
                     INSERT INTO brands (
-                        brand_id, name, industry, description, sustainability_score, recycling_info
-                    ) VALUES (%s, %s, %s, %s, %s, %s)
+                        brand_id, name, industry,
+                        main_products, sustainability_initiatives,
+                        plastic_materials_used, past_collaborations,
+                        operational_regions
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (brand_id) DO UPDATE SET
                         name = EXCLUDED.name,
                         industry = EXCLUDED.industry,
-                        description = EXCLUDED.description,
-                        sustainability_score = EXCLUDED.sustainability_score,
-                        recycling_info = EXCLUDED.recycling_info
+                        main_products = EXCLUDED.main_products,
+                        sustainability_initiatives = EXCLUDED.sustainability_initiatives,
+                        plastic_materials_used = EXCLUDED.plastic_materials_used,
+                        past_collaborations = EXCLUDED.past_collaborations,
+                        operational_regions = EXCLUDED.operational_regions
                     RETURNING brand_id
                 """, (
                     brand_data.get("brand_id"),
                     brand_data.get("name"),
                     brand_data.get("industry"),
-                    brand_data.get("description"),
-                    brand_data.get("sustainability_score"),
-                    brand_data.get("recycling_info"),
+                    Json(brand_data.get("main_products")),
+                    Json(brand_data.get("sustainability_initiatives")),
+                    Json(brand_data.get("plastic_materials_used")),
+                    Json(brand_data.get("past_collaborations")),
+                    Json(brand_data.get("operational_regions")),
                 ))
                 result = cur.fetchone()
                 return result[0] if result else None
@@ -100,26 +109,25 @@ class PostgresManager:
             with conn.cursor() as cur:
                 cur.execute("""
                     INSERT INTO plastic_types (
-                        plastic_id, type, description, properties, applications, recyclable, biodegradable, decomposition_time
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        plastic_id, type, properties, applications,
+                        environmental_impact, recycling_potential, regional_relevance
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (plastic_id) DO UPDATE SET
                         type = EXCLUDED.type,
-                        description = EXCLUDED.description,
                         properties = EXCLUDED.properties,
                         applications = EXCLUDED.applications,
-                        recyclable = EXCLUDED.recyclable,
-                        biodegradable = EXCLUDED.biodegradable,
-                        decomposition_time = EXCLUDED.decomposition_time
+                        environmental_impact = EXCLUDED.environmental_impact,
+                        recycling_potential = EXCLUDED.recycling_potential,
+                        regional_relevance = EXCLUDED.regional_relevance
                     RETURNING plastic_id
                 """, (
                     plastic_data.get("plastic_id"),
                     plastic_data.get("type"),
-                    plastic_data.get("description"),
-                    Json(plastic_data.get("properties")) if plastic_data.get("properties") else None,
-                    Json(plastic_data.get("applications")) if plastic_data.get("applications") else None,
-                    plastic_data.get("recyclable"),
-                    plastic_data.get("biodegradable"),
-                    plastic_data.get("decomposition_time"),
+                    Json(plastic_data.get("properties")),
+                    Json(plastic_data.get("applications")),
+                    plastic_data.get("environmental_impact"),
+                    plastic_data.get("recycling_potential"),
+                    plastic_data.get("regional_relevance"),
                 ))
                 result = cur.fetchone()
                 return result[0] if result else None

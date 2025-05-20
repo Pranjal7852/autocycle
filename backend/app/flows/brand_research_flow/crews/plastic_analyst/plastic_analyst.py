@@ -4,9 +4,9 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict
 from crewai_tools import SerperDevTool
 from app.utils.crew_logger import CrewLogger
-from pydantic import BaseModel
 import os
 import logging
+from app.models.schemas import PlasticMaterialProfile
 
 # Create logs directory if it doesn't exist
 log_dir = os.path.join(os.path.dirname(__file__), 'logs')
@@ -19,13 +19,6 @@ logger = CrewLogger(
     console_output=True
 )
 
-class PlasticMaterialProfile(BaseModel):
-    type: str
-    properties: List[str]
-    applications: List[str]
-    environmental_impact: str
-    recycling_potential: str
-    regional_relevance: str = ""
 
 @CrewBase
 class PlasticAnalystCrew:

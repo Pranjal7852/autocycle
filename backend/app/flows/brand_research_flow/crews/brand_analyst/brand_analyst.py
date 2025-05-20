@@ -4,7 +4,7 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict
 from crewai_tools import SerperDevTool
 from app.utils.crew_logger import CrewLogger
-from pydantic import BaseModel
+from app.models.schemas import BrandProfile
 import os
 import logging
 
@@ -18,16 +18,6 @@ logger = CrewLogger(
     log_level=logging.DEBUG,
     console_output=True
 )
-
-# Consistent structured output model for brand analysis
-class BrandProfile(BaseModel):
-    name: str
-    industry: str
-    main_products: List[str]
-    sustainability_initiatives: List[str]
-    plastic_materials_used: List[str]
-    past_collaborations: List[str]
-    operational_regions: List[str]
 
 @CrewBase
 class BrandAnalystCrew:
