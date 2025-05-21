@@ -69,7 +69,7 @@ class PostgresManager:
 
     def store_brand_data(self, brand_data: Dict) -> Optional[str]:
         conn = self._get_connection()
-        print("DEBUG - brand_data:", brand_data)
+        print("POSTGRESS INSERT DEBUG - brand_data:", brand_data)
         try:
             with conn.cursor() as cur:
                 cur.execute("""

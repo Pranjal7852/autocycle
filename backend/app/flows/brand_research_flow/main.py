@@ -6,9 +6,19 @@ from app.flows.brand_research_flow.crews.brand_collab.brand_collab import BrandC
 from app.utils.db_queries import DataManager
 from typing import Dict
 import asyncio
+import os
 import logging
+from app.utils.crew_logger import CrewLogger
 
-logging.basicConfig(level=logging.INFO)
+log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(log_dir, exist_ok=True)
+log_file = os.path.join(log_dir, 'crew_execution.log')
+
+logger = CrewLogger(
+    log_file=log_file,
+    log_level=logging.DEBUG,
+    console_output=True
+)
 
 class BrandResearchState(BaseModel):
     brand_name: str = ""
@@ -99,18 +109,33 @@ class ResearchFlow(Flow[BrandResearchState]):
     async def conduct_brand_research(self):
         try:
             input_data = {"brand": self.state.brand_name}
+            
             if self.state.location:
                 input_data["location"] = self.state.location
-
+            
             result = await self.brand_research_crew.kickoff(input_data=input_data)
         
-            self.state.brand_results = result
+            self.state.brand_results = result.to_dict()
             self.state.brand_research_complete = True
-            asyncio.create_task(self.save_brand_to_db(result.to_dict()))
-            return "brand_research_complete"
+            return result
         except Exception as e:
-            logging.error(f"Error researching brand: {e}")
+            logger.logger.error(f"Error researching brand: {e}")
             return {"brand_research": "failed", "error": str(e)}
+    
+    @router("conduct_brand_research")
+    async def route_after_brand_research(self):
+        logger.logger.info(f"Inside Router after research: {self.state.brand_results}")
+        if self.state.brand_research_complete:
+            try:
+                logger.logger.info(f"Storing Brand Info After research: {self.state.brand_results}")
+                await self.save_brand_to_db(self.state.brand_results)
+                self.state.brand_saved_to_db = True
+                return "brand_research_complete"
+            except Exception as e:
+                logger.logger.error(f"Error storing brand: {e}")
+                return {"brand_storing": "failed", "error": str(e)}
+        return "brand_research_complete"
+
 
     @listen("conduct_plastic_research")
     async def conduct_plastic_research(self):
@@ -120,26 +145,33 @@ class ResearchFlow(Flow[BrandResearchState]):
                 input_data["location"] = self.state.location
 
             result = await self.plastic_research_crew.kickoff(input_data=input_data)
-            self.state.plastic_results = result
+            self.state.plastic_results = result.to_dict()
             self.state.plastic_research_complete = True
-            asyncio.create_task(self.save_plastic_to_db(result.to_dict()))
-            return "plastic_research_complete"
-        except Exception as e:
-            logging.error(f"Error researching plastic: {e}")
+            return result
+        except Exception as e: 
+            logger.logger.error(f"Error researching plastic: {e}")
             return {"plastic_research": "failed", "error": str(e)}
 
+    @router("conduct_plastic_research")
+    async def route_after_plastic_research(self):
+        logger.logger.info(f"Inside Router after plastic research: {self.state.plastic_results}")
+        if self.state.plastic_research_complete:
+            try:
+                logger.logger.info(f"Storing Plastic Info After research: {self.state.plastic_results}")
+                await self.save_plastic_to_db(self.state.plastic_results)
+                self.state.plastic_saved_to_db = True
+                return "plastic_research_complete"
+            except Exception as e:
+                logger.logger.error(f"Error storing plastic: {e}")
+                return {"plastic_storing": "failed", "error": str(e)}
+        return "plastic_research_complete"
+    
     async def save_brand_to_db(self, brand_data: Dict):
         try:
-            logging.debug(f"CrewOutput: {brand_data}")
-            logging.debug(f"CrewOutput attributes: {dir(brand_data)}")
-            logging.debug(f"Raw: {getattr(brand_data, 'raw', None)}")
-            logging.debug(f"JSON Dict: {getattr(brand_data, 'json_dict', None)}")
-            logging.debug(f"Pydantic: {getattr(brand_data, 'pydantic', None)}")
-            logging.debug(f"Tasks Output: {getattr(brand_data, 'tasks_output', None)}")
-            await asyncio.to_thread(self.data_manager.add_brand_data, brand_data)
+            await self.data_manager.add_brand_data(brand_data)
             self.state.brand_saved_to_db = True
         except Exception as e:
-            logging.error(f"Error saving brand to DB: {e}")
+            logger.logger.error(f"Error saving brand to DB: {e}")
             self.state.brand_saved_to_db = False
 
     async def save_plastic_to_db(self, plastic_data: Dict):
@@ -147,7 +179,7 @@ class ResearchFlow(Flow[BrandResearchState]):
             await asyncio.to_thread(self.data_manager.add_plastic_data, plastic_data)
             self.state.plastic_saved_to_db = True
         except Exception as e:
-            logging.error(f"Error saving plastic to DB: {e}")
+            logger.logger.error(f"Error saving plastic to DB: {e}")
 
     @listen(and_("brand_research_complete", "plastic_research_complete"))
     async def process_collaboration(self):
@@ -160,7 +192,7 @@ class ResearchFlow(Flow[BrandResearchState]):
             self.state.combined_results = combined_results
             return {"status": "collaboration_complete", "results": combined_results}
         except Exception as e:
-            logging.error(f"Error in collaboration: {e}")
+            logger.logger.error(f"Error in collaboration: {e}")
             return {"status": "collaboration_failed", "error": str(e)}
 
 
@@ -171,5 +203,5 @@ async def kickoff(brand_name: str = "", plastic_type: str = "", location: str = 
     flow.state.plastic_type = plastic_type
     flow.state.location = location
     flow.plot("ResearchFlowPlot")
-    logging.info(flow.state)
+    logger.logger.info(flow.state)
     return await flow.kickoff_async()

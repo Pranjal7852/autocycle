@@ -33,6 +33,7 @@ class VectorDBManager:
         self.client = weaviate.connect_to_weaviate_cloud(
             cluster_url=weaviate_url,
             auth_credentials=AuthApiKey(weaviate_api_key),
+            skip_init_checks=True
         )
         print(self.client.is_ready())
 
@@ -72,6 +73,11 @@ class VectorDBManager:
     def add_brand(self, brand_model: BrandProfile, brand_id: str):
         embedding_text = brand_model.to_embedding_text().lower()
         embedding = self.model.encode(embedding_text)
+        print("VECTORDB INSERT DEBUG - brand_data:", {
+            "name": brand_model.name.lower(),
+            "brand_id": brand_id,
+            "embedding_text": embedding_text
+        })
         self.client.collections.get("Brand").data.insert(
         uuid=brand_id,
         properties={
