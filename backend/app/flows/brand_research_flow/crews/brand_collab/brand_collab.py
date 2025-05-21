@@ -39,11 +39,19 @@ class BrandCollabsCrew():
     @agent
     def collaboration_strategist(self) -> Agent:
         return Agent(
-            role="Collaboration Strategist",
-            goal="Find strong brand collaboration matches using pattern recognition, not heavy research.",
-            backstory="""You are a strategic expert in sustainable brand partnerships.
-            You match brands with complementary missions and materials.
-            You prefer reasoning over searching, and only use one search if absolutely necessary.""",
+           role="Cross-Industry Collaboration Strategist",
+            goal="Design imaginative, brand-driven partnerships using the given plastic material as a creative anchor.",
+            backstory="""You are a top creative strategist at a global innovation agency. 
+You specialize in designing iconic, cross-industry brand collaborations that blend sustainability, emotional resonance, and cultural relevance.
+
+You think like a product visionary and marketer. You know how to turn recycled materials into symbols of innovation, nostalgia, or brand purpose.
+
+You prioritize:
+- Emotional storytelling
+- Creative product concepts
+- Unexpected brand pairings (e.g., tech + fashion, auto + toys)
+
+Avoid boring or overly similar industry matches. Only use search if you need fresh brand ideas — not for research-heavy tasks.""",
             tools=[SerperDevTool()],
             verbose=False,
             allow_delegation=False
@@ -52,21 +60,44 @@ class BrandCollabsCrew():
     @task
     def identify_collaboration_opportunities(self) -> Task:
         return Task(
-            description="""You are given two data objects: brand_data and plastic_data.
+            description="""You are given two structured inputs: 'brand_data' and 'plastic_data'.
 
-Use them to recommend 5 strong collaboration candidates.
+Your task is to recommend 5 creative **brand collaboration opportunities**.
 
-**DO NOT** search for the brand or plastic. Use what's provided.
+Each recommendation must:
+- Feature a **brand from a different industry** than the input brand.
+- Include a **product concept** that meaningfully combines the brand identity, the collaborator’s identity, and the plastic material (symbolically or functionally).
+- Include a **rationale** grounded in storytelling, emotional resonance, or shared brand ethos — not just shared sustainability focus.
 
-Search only once if you need new brands in this format:
-"sustainable brands [industry from brand_data] [location if available]"
+Use the plastic material as a storytelling or innovation anchor (e.g., upcycled, symbolic, functional).
 
-Look for:
-- Complementary industries (not direct competitors)
-- Brands with sustainability goals
-- Brands that might use the plastic type in their products
+You may search **once** for inspiration (e.g., "iconic toy brands", "youth tech brands", or "eco-luxury fashion").
 
-Your final output must be structured and insightful.""",
+Avoid:
+- Recommending brands in the same or very similar industry.
+- Generic or obvious matches based purely on sustainability.
+
+Think like a **brand innovation strategist** at a global agency developing high-visibility, cross-industry collabs.
+
+Use this output format:
+
+{
+  "input_summary": {
+    "brand": "Brief brand name and industry",
+    "plastic": "Plastic type and one key property"
+  },
+  "top_collaborating_brands": [
+    {
+      "name": "string",
+      "industry": "string",
+      "rationale": "Why this brand is a creative and strategic match",
+      "product_concept": "Surprising or emotionally resonant joint product idea using the plastic"
+    }
+  ]
+}
+
+Only return 5 brands. Less is okay if it improves creativity and quality.
+""",
             agent=self.collaboration_strategist(),
             expected_output="""Use this exact format:
 

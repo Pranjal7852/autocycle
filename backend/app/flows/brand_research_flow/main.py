@@ -106,7 +106,7 @@ class ResearchFlow(Flow[BrandResearchState]):
         return "plastic_research_complete"
 
     @listen("conduct_brand_research")
-    async def conduct_brand_research(self):
+    async def action_conduct_brand_research(self):
         try:
             input_data = {"brand": self.state.brand_name}
             
@@ -117,28 +117,27 @@ class ResearchFlow(Flow[BrandResearchState]):
         
             self.state.brand_results = result.to_dict()
             self.state.brand_research_complete = True
+            # Return the string event name to trigger next step
             return result
         except Exception as e:
             logger.logger.error(f"Error researching brand: {e}")
-            return {"brand_research": "failed", "error": str(e)}
+            return "brand_research_failed"
     
-    @router("conduct_brand_research")
+    # Changed to listen for the new event string
+    @router(action_conduct_brand_research)
     async def route_after_brand_research(self):
         logger.logger.info(f"Inside Router after research: {self.state.brand_results}")
-        if self.state.brand_research_complete:
-            try:
-                logger.logger.info(f"Storing Brand Info After research: {self.state.brand_results}")
-                await self.save_brand_to_db(self.state.brand_results)
-                self.state.brand_saved_to_db = True
-                return "brand_research_complete"
-            except Exception as e:
-                logger.logger.error(f"Error storing brand: {e}")
-                return {"brand_storing": "failed", "error": str(e)}
-        return "brand_research_complete"
-
+        try:
+            logger.logger.info(f"Storing Brand Info After research: {self.state.brand_results}")
+            await self.save_brand_to_db(self.state.brand_results)
+            self.state.brand_saved_to_db = True
+            return "brand_research_complete"
+        except Exception as e:
+            logger.logger.error(f"Error storing brand: {e}")
+            return {"brand_storing": "failed", "error": str(e)}
 
     @listen("conduct_plastic_research")
-    async def conduct_plastic_research(self):
+    async def action_conduct_plastic_research(self):
         try:
             input_data = {"plastic_type": self.state.plastic_type}
             if self.state.location:
@@ -147,24 +146,24 @@ class ResearchFlow(Flow[BrandResearchState]):
             result = await self.plastic_research_crew.kickoff(input_data=input_data)
             self.state.plastic_results = result.to_dict()
             self.state.plastic_research_complete = True
+            # Return a different signal to indicate research is done
             return result
         except Exception as e: 
             logger.logger.error(f"Error researching plastic: {e}")
             return {"plastic_research": "failed", "error": str(e)}
 
-    @router("conduct_plastic_research")
+    # Changed to listen for the new status signal
+    @router(action_conduct_plastic_research)
     async def route_after_plastic_research(self):
         logger.logger.info(f"Inside Router after plastic research: {self.state.plastic_results}")
-        if self.state.plastic_research_complete:
-            try:
-                logger.logger.info(f"Storing Plastic Info After research: {self.state.plastic_results}")
-                await self.save_plastic_to_db(self.state.plastic_results)
-                self.state.plastic_saved_to_db = True
-                return "plastic_research_complete"
-            except Exception as e:
-                logger.logger.error(f"Error storing plastic: {e}")
-                return {"plastic_storing": "failed", "error": str(e)}
-        return "plastic_research_complete"
+        try:
+            logger.logger.info(f"Storing Plastic Info After research: {self.state.plastic_results}")
+            await self.save_plastic_to_db(self.state.plastic_results)
+            self.state.plastic_saved_to_db = True
+            return "plastic_research_complete"
+        except Exception as e:
+            logger.logger.error(f"Error storing plastic: {e}")
+            return {"plastic_storing": "failed", "error": str(e)}
     
     async def save_brand_to_db(self, brand_data: Dict):
         try:
