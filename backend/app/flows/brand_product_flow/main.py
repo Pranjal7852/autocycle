@@ -1,8 +1,11 @@
 from pydantic import BaseModel
+from typing import List
 from crewai.flow import Flow, listen, start, router, and_
-from app.flows.brand_research_flow.crews.brand_analyst.brand_analyst import BrandAnalystCrew
-from app.flows.brand_research_flow.crews.plastic_analyst.plastic_analyst import PlasticAnalystCrew
-from app.flows.brand_research_flow.crews.brand_collab.brand_collab import BrandCollabsCrew
+from app.flows.brand_product_flow.crews.brand_analyst.brand_analyst import BrandAnalystCrew
+from app.flows.brand_product_flow.crews.plastic_analyst.plastic_analyst import PlasticAnalystCrew
+from app.flows.brand_product_flow.crews.brand_product_ideas.brand_product_ideas import BrandProductIdeasCrew
+from app.flows.brand_product_flow.crews.product_pitch_generator.product_pitch_generator import ProductPitchCrew
+from app.flows.brand_product_flow.crews.product_image_generator.product_image_generator import ProductImageCrew
 from app.utils.db_queries import DataManager
 from typing import Dict
 import asyncio
@@ -20,14 +23,19 @@ logger = CrewLogger(
     console_output=True
 )
 
-class BrandResearchState(BaseModel):
-    brand_name: str = ""
-    plastic_type: str = ""
-    location: str = ""
+class BrandProductState(BaseModel):
+    source_brand: str = ""
+    source_plastic: str = ""
+    source_location: str = ""
+    target_brand: str = ""
+
     brand_results: dict = {}
     plastic_results: dict = {}
-    collab_results: dict = {}
-    combined_results: dict = {}
+
+    product_ideas: List[dict] = []
+    product_pitches: List[str] = []
+    product_images: List[str] = []
+
     brand_research_needed: bool = False
     plastic_research_needed: bool = False
     brand_research_complete: bool = False
@@ -35,14 +43,16 @@ class BrandResearchState(BaseModel):
     brand_saved_to_db: bool = False
     plastic_saved_to_db: bool = False
 
-class ResearchFlow(Flow[BrandResearchState]):
+class BrandProductFlow(Flow[BrandProductState]):
     def __init__(self, data_manager: DataManager):
         super().__init__()
         logging.info("Initializing Research Flow")
         self.data_manager = data_manager
         self.brand_research_crew = BrandAnalystCrew()
         self.plastic_research_crew = PlasticAnalystCrew()
-        self.collab_crew = BrandCollabsCrew()
+        self.ideator_crew = BrandProductIdeasCrew()
+        self.pitcher_crew = ProductPitchCrew()
+        self.image_crew = ProductImageCrew()
         self.similarity_threshold = 0.8
 
     @start()
@@ -195,12 +205,13 @@ class ResearchFlow(Flow[BrandResearchState]):
             return {"status": "collaboration_failed", "error": str(e)}
 
 
-async def brand_research_kickoff(brand_name: str = "", plastic_type: str = "", location: str = ""):
+async def brand_product_kickoff(source_brand: str = "", source_plastic: str = "", source_location: str = "", target_brand: str = ""):
     data_manager = DataManager()
-    flow = ResearchFlow(data_manager)
-    flow.state.brand_name = brand_name
-    flow.state.plastic_type = plastic_type
-    flow.state.location = location
-    flow.plot("ResearchFlowPlot")
+    flow = BrandProductFlow(data_manager)
+    flow.state.source_brand = source_brand
+    flow.state.source_plastic = source_plastic
+    flow.state.source_location = source_location
+    flow.state.target_brand = target_brand
+    flow.plot("BrandProductFlowPlot")
     logger.logger.info(flow.state)
     return await flow.kickoff_async()

@@ -1,0 +1,14 @@
+analyze_plastic_material:
+  description: >
+    Retrieve a summarized profile of '{plastic_type}' from static datasets. Focus on upcycling opportunities and key properties relevant to consumer products.
+  expected_output: >
+    {
+      "type_name": "...",
+      "key_properties": {
+        "physical": "...",
+        "chemical": "..."
+      },
+      "common_uses": "...",
+      "upcycling_opportunities": ["...", "..."]
+    }
+  agent: plastic_analyst
