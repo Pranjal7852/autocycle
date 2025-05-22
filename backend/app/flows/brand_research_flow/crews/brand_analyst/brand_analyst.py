@@ -59,7 +59,7 @@ class BrandAnalystCrew:
                 3. Any past or current sustainability collaborations
                 4. Their operational or manufacturing regions
                 
-                If 'location' is given, prefer sources relevant to that region.
+                If '{location}' is given, prefer sources relevant to that region.
                 
                 DO NOT perform more than one query. DO NOT infer data.
                 """,

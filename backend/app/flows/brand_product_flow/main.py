@@ -25,22 +25,30 @@ logger = CrewLogger(
 
 class BrandProductState(BaseModel):
     source_brand: str = ""
-    source_plastic: str = ""
-    source_location: str = ""
+    plastic_type: str = ""
+    location: str = ""
     target_brand: str = ""
 
-    brand_results: dict = {}
+    source_brand_results: dict = {}
+    target_brand_results: dict = {}
     plastic_results: dict = {}
 
     product_ideas: List[dict] = []
     product_pitches: List[str] = []
     product_images: List[str] = []
 
-    brand_research_needed: bool = False
+    source_brand_research_needed: bool = False
+    target_brand_research_needed: bool = False
+    source_brand_research_complete: bool = False
+    target_brand_research_complete: bool = False
+
+    
     plastic_research_needed: bool = False
-    brand_research_complete: bool = False
     plastic_research_complete: bool = False
-    brand_saved_to_db: bool = False
+    collaboration_complete: bool = False
+
+    source_brand_saved_to_db: bool = False
+    target_brand_saved_to_db: bool = False
     plastic_saved_to_db: bool = False
 
 class BrandProductFlow(Flow[BrandProductState]):
@@ -58,32 +66,33 @@ class BrandProductFlow(Flow[BrandProductState]):
     @start()
     async def initialize_research(self):
         logging.info("Initializing research")
-        if not self.state.brand_name and not self.state.plastic_type:
-            raise ValueError("Either brand_name or plastic_type must be provided")
+        if not self.state.source_brand and not self.state.target_brand and not self.state.source_plastic:
+            raise ValueError("At least one of source_brand, target_brand, or plastic_type must be provided")
 
         await asyncio.gather(
-            self.check_brand_database(),
+            self.check_brand_database(self.state.source_brand, "source"),
+            self.check_brand_database(self.state.target_brand, "target"),
             self.check_plastic_database()
         )
         return {"status": "initialized"}
 
-    async def check_brand_database(self):
-        if not self.state.brand_name:
-            self.state.brand_research_complete = True
+    async def check_brand_database(self, brand_name: str, role: str):
+        if not brand_name:
+            setattr(self.state, f"{role}_brand_research_complete", True)
             return
 
         brand_data = await asyncio.to_thread(
             self.data_manager.search_brand, 
-            self.state.brand_name
+            brand_name
         )
-        self.state.brand_results = brand_data or {}
-        similarity = self.state.brand_results.get("similarity_score", 0)
-        print(f"vector Search {similarity} for { self.state.brand_name}")
-        print(f"vector Search { self.state.brand_name} for { self.state.brand_results}")
+        similarity = (brand_data or {}).get("similarity_score", 0)
+        print(f"[{role}] vector similarity for '{brand_name}': {similarity}")
+
         if similarity < self.similarity_threshold:
-            self.state.brand_research_needed = True
+            setattr(self.state, f"{role}_brand_research_needed", True)
         else:
-            self.state.brand_research_complete = True
+            setattr(self.state, f"{role}_brand_results", brand_data)
+            setattr(self.state, f"{role}_brand_research_complete", True)
 
     async def check_plastic_database(self):
         if not self.state.plastic_type:
@@ -104,10 +113,12 @@ class BrandProductFlow(Flow[BrandProductState]):
             self.state.plastic_research_complete = True
 
     @router(initialize_research)
-    async def route_brand_research(self):
-        if self.state.brand_research_needed:
-            return "conduct_brand_research"
-        return "brand_research_complete"
+    async def route_source_brand_research(self):
+        return "conduct_source_brand_research" if self.state.source_brand_research_needed else "source_brand_research_complete"
+
+    @router(initialize_research)
+    async def route_target_brand_research(self):
+        return "conduct_target_brand_research" if self.state.target_brand_research_needed else "target_brand_research_complete" 
 
     @router(initialize_research)
     async def route_plastic_research(self):
@@ -115,36 +126,66 @@ class BrandProductFlow(Flow[BrandProductState]):
             return "conduct_plastic_research"
         return "plastic_research_complete"
 
-    @listen("conduct_brand_research")
-    async def action_conduct_brand_research(self):
+    @listen("conduct_source_brand_research")
+    async def action_conduct_source_brand_research(self):
         try:
-            input_data = {"brand": self.state.brand_name}
+            input_data = {"brand": self.state.source_brand}
             
             if self.state.location:
                 input_data["location"] = self.state.location
             
             result = await self.brand_research_crew.kickoff(input_data=input_data)
         
-            self.state.brand_results = result.to_dict()
-            self.state.brand_research_complete = True
+            self.state.source_brand_results = result.to_dict()
+            self.state.source_brand_research_complete = True
             # Return the string event name to trigger next step
             return result
         except Exception as e:
-            logger.logger.error(f"Error researching brand: {e}")
-            return "brand_research_failed"
+            logger.logger.error(f"Error researching source brand: {e}")
+            return "source_brand_research_failed"
     
-    # Changed to listen for the new event string
-    @router(action_conduct_brand_research)
-    async def route_after_brand_research(self):
-        logger.logger.info(f"Inside Router after research: {self.state.brand_results}")
+    @router(action_conduct_source_brand_research)
+    async def route_after_source_brand_research(self):
+        logger.logger.info(f"Inside Router after research: {self.state.source_brand_results}")
         try:
-            logger.logger.info(f"Storing Brand Info After research: {self.state.brand_results}")
-            await self.save_brand_to_db(self.state.brand_results)
-            self.state.brand_saved_to_db = True
-            return "brand_research_complete"
+            logger.logger.info(f"Storing Brand Info After research: {self.state.source_brand_results}")
+            await self.data_manager.add_brand_data(self.state.source_brand_results)
+            self.state.source_brand_saved_to_db = True
+            return "source_brand_research_complete"
         except Exception as e:
-            logger.logger.error(f"Error storing brand: {e}")
-            return {"brand_storing": "failed", "error": str(e)}
+            logger.logger.error(f"Error storing source brand: {e}")
+            return {"source_brand_storing": "failed", "error": str(e)}
+        
+    @listen("conduct_target_brand_research")
+    async def action_conduct_target_brand_research(self):
+        try:
+            input_data = {"brand": self.state.target_brand}
+            
+            if self.state.location:
+                input_data["location"] = self.state.location
+            
+            result = await self.brand_research_crew.kickoff(input_data=input_data)
+        
+            self.state.target_brand_results = result.to_dict()
+            self.state.target_brand_research_complete = True
+            # Return the string event name to trigger next step
+            return result
+        except Exception as e:
+            logger.logger.error(f"Error researching target brand: {e}")
+            return "target_brand_research_failed"
+    
+    
+    @router(action_conduct_target_brand_research)
+    async def route_after_target_brand_research(self):
+        logger.logger.info(f"Inside Router after research: {self.state.target_brand_results}")
+        try:
+            logger.logger.info(f"Storing Brand Info After research: {self.state.target_brand_results}")
+            await self.data_manager.add_brand_data(self.state.target_brand_results)
+            self.state.target_brand_saved_to_db = True
+            return "target_brand_research_complete"
+        except Exception as e:
+            logger.logger.error(f"Error storing target brand: {e}")
+            return {"target_brand_storing": "failed", "error": str(e)}
 
     @listen("conduct_plastic_research")
     async def action_conduct_plastic_research(self):
@@ -168,49 +209,35 @@ class BrandProductFlow(Flow[BrandProductState]):
         logger.logger.info(f"Inside Router after plastic research: {self.state.plastic_results}")
         try:
             logger.logger.info(f"Storing Plastic Info After research: {self.state.plastic_results}")
-            await self.save_plastic_to_db(self.state.plastic_results)
+            await self.data_manager.add_plastic_data(self.state.plastic_results)
             self.state.plastic_saved_to_db = True
             return "plastic_research_complete"
         except Exception as e:
             logger.logger.error(f"Error storing plastic: {e}")
             return {"plastic_storing": "failed", "error": str(e)}
-    
-    async def save_brand_to_db(self, brand_data: Dict):
-        try:
-            await self.data_manager.add_brand_data(brand_data)
-            self.state.brand_saved_to_db = True
-        except Exception as e:
-            logger.logger.error(f"Error saving brand to DB: {e}")
-            self.state.brand_saved_to_db = False
 
-    async def save_plastic_to_db(self, plastic_data: Dict):
-        try:
-            await asyncio.to_thread(self.data_manager.add_plastic_data, plastic_data)
-            self.state.plastic_saved_to_db = True
-        except Exception as e:
-            logger.logger.error(f"Error saving plastic to DB: {e}")
-
-    @listen(and_("brand_research_complete", "plastic_research_complete"))
-    async def process_collaboration(self):
+    @listen(and_("source_brand_research_complete","target_brand_research_complete", "plastic_research_complete"))
+    async def process_product_ideas(self):
         try:
             input_data = {
-                "brand_data": self.state.brand_results,
+                "source_brand_data": self.state.source_brand_results,
+                "target_brand_data": self.state.target_brand_results,
                 "plastic_data": self.state.plastic_results
             }
-            combined_results = await self.collab_crew.kickoff(input_data=input_data)
-            self.state.combined_results = combined_results
-            return {"status": "collaboration_complete", "results": combined_results}
+            combined_results = await self.ideator_crew.kickoff(input_data=input_data)
+            self.state.product_ideas = combined_results
+            return {"status": "product_ideas_complete", "results": combined_results}
         except Exception as e:
-            logger.logger.error(f"Error in collaboration: {e}")
-            return {"status": "collaboration_failed", "error": str(e)}
+            logger.logger.error(f"Error in product ideas: {e}")
+            return {"status": "product_ideas_failed", "error": str(e)}
 
 
-async def brand_product_kickoff(source_brand: str = "", source_plastic: str = "", source_location: str = "", target_brand: str = ""):
+async def brand_product_kickoff(source_brand: str = "", plastic_type: str = "", location: str = "", target_brand: str = ""):
     data_manager = DataManager()
     flow = BrandProductFlow(data_manager)
     flow.state.source_brand = source_brand
-    flow.state.source_plastic = source_plastic
-    flow.state.source_location = source_location
+    flow.state.plastic_type = plastic_type
+    flow.state.location = location
     flow.state.target_brand = target_brand
     flow.plot("BrandProductFlowPlot")
     logger.logger.info(flow.state)

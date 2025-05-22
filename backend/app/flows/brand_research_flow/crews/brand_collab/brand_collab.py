@@ -60,7 +60,7 @@ Avoid boring or overly similar industry matches. Only use search if you need fre
     @task
     def identify_collaboration_opportunities(self) -> Task:
         return Task(
-            description="""You are given two structured inputs: 'brand_data' and 'plastic_data'.
+            description="""You are given two structured inputs: '{brand_data}' and '{plastic_data}'.
 
 Your task is to recommend 5 creative **brand collaboration opportunities**.
 
