@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 from typing import List
 from crewai.flow import Flow, listen, start, router, and_
-from app.flows.brand_product_flow.crews.brand_analyst.brand_analyst import BrandAnalystCrew
-from app.flows.brand_product_flow.crews.plastic_analyst.plastic_analyst import PlasticAnalystCrew
+from app.crews.brand_analyst.brand_analyst import BrandAnalystCrew
+from app.crews.plastic_analyst.plastic_analyst import PlasticAnalystCrew
 from app.flows.brand_product_flow.crews.brand_product_ideas.brand_product_ideas import BrandProductIdeasCrew
 from app.flows.brand_product_flow.crews.product_pitch_generator.product_pitch_generator import ProductPitchCrew
 from app.flows.brand_product_flow.crews.product_image_generator.product_image_generator import ProductImageCrew

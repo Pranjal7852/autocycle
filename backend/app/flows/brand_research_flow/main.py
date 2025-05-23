@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from crewai.flow import Flow, listen, start, router, and_
-from app.flows.brand_research_flow.crews.brand_analyst.brand_analyst import BrandAnalystCrew
-from app.flows.brand_research_flow.crews.plastic_analyst.plastic_analyst import PlasticAnalystCrew
+from app.crews.brand_analyst.brand_analyst import BrandAnalystCrew
+from app.crews.plastic_analyst.plastic_analyst import PlasticAnalystCrew
 from app.flows.brand_research_flow.crews.brand_collab.brand_collab import BrandCollabsCrew
 from app.utils.db_queries import DataManager
 from typing import Dict
