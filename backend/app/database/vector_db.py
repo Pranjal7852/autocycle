@@ -6,8 +6,8 @@ import weaviate
 from weaviate.connect import ConnectionParams
 from weaviate.classes.config import Configure, Property, DataType
 from weaviate.auth import AuthApiKey
-from app.flows.brand_research_flow.crews.brand_analyst.brand_analyst import BrandProfile
-from app.flows.brand_research_flow.crews.plastic_analyst.plastic_analyst import PlasticMaterialProfile
+from app.models.schemas import BrandProfile
+from app.models.schemas import PlasticMaterialProfile
 import logging
 
 load_dotenv()
