@@ -3,8 +3,9 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict
 from crewai_tools import SerperDevTool
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from app.utils.crew_logger import CrewLogger
+from typing import List, Dict, Optional
 import logging
 import os
 
@@ -20,14 +21,19 @@ logger = CrewLogger(
 )
 
 class CollaborationRecommendation(BaseModel):
-    name: str
-    industry: str
-    rationale: str
-    product_concept: str
+    brand_name: str = Field(description="Name of the collaborating brand")
+    brand_placement: List[str] = Field(description="Key brand positioning attributes")
+    sustainability_placement: str = Field(description="Brand's sustainability approach")
+    product_assumptions: List[str] = Field(description="Potential physical product types")
+    collaboration_summary: str = Field(description="Brief description of the collaboration concept")
+    estimated_impact: Optional[int] = Field(default=None, description="Potential environmental or market impact in million")
+    confidence_score: Optional[int] = Field(default=None, description="Confidence score")
+    combined_reach: Optional[int] = Field(default=None, description="Combined marketing reach of both brands in millions")
 
 class CollaborationOutput(BaseModel):
-    input_summary: Dict[str, str]
-    top_collaborating_brands: List[CollaborationRecommendation]
+    input_summary: Dict[str, str] = Field(description="Summary of input brand and plastic data")
+    top_collaborations: List[CollaborationRecommendation] = Field(description="List of collaboration recommendations")
+
 @CrewBase
 class BrandCollabsCrew():
     agents: List[BaseAgent]
@@ -40,18 +46,40 @@ class BrandCollabsCrew():
     def collaboration_strategist(self) -> Agent:
         return Agent(
            role="Cross-Industry Collaboration Strategist",
-            goal="Design imaginative, brand-driven partnerships using the given plastic material as a creative anchor.",
-            backstory="""You are a top creative strategist at a global innovation agency. 
-You specialize in designing iconic, cross-industry brand collaborations that blend sustainability, emotional resonance, and cultural relevance.
+            goal="Design physical product collaborations using sustainable plastic materials as the creative and functional core.",
+          backstory="""You are an expert strategic product designer with deep expertise in circular economy innovation
+and cross-industry partnerships. You specialize in creating compelling physical product collaborations that combine
+brand storytelling with sustainable material innovation.
 
-You think like a product visionary and marketer. You know how to turn recycled materials into symbols of innovation, nostalgia, or brand purpose.
+Your core competencies include:
+- Identifying synergistic brand partnerships across different industries
+- Leveraging recycled and renewable plastic properties for functional design
+- Creating products that enhance both brands' market positioning
+- Ensuring manufacturability and market viability of collaboration concepts
+- Understanding consumer psychology and sustainable product adoption
 
-You prioritize:
-- Emotional storytelling
-- Creative product concepts
-- Unexpected brand pairings (e.g., tech + fashion, auto + toys)
+You think like an industrial designer who deeply understands brand equity, material science, and market dynamics.
+Your recommendations are always grounded in physical, manufacturable products that tell a compelling sustainability story.""",
+            tools=[SerperDevTool()],
+            verbose=False,
+            allow_delegation=False
+        )
+    
+    @agent  
+    def market_analyst(self) -> Agent:
+        return Agent(
+            role="Sustainable Product Market Analyst",
+            goal="Validate collaboration concepts for market viability and consumer appeal.",
+            backstory="""You are a market research specialist focused on sustainable product launches and brand collaborations.
+You analyze market trends, consumer behavior, and competitive landscapes to ensure collaboration recommendations
+have strong commercial potential.
 
-Avoid boring or overly similar industry matches. Only use search if you need fresh brand ideas — not for research-heavy tasks.""",
+You evaluate:
+- Market readiness for sustainable product innovations
+- Consumer willingness to pay for collaborative products
+- Competitive positioning and differentiation opportunities
+- Regulatory and supply chain considerations
+- Brand alignment and potential market conflicts""",
             tools=[SerperDevTool()],
             verbose=False,
             allow_delegation=False
@@ -60,64 +88,51 @@ Avoid boring or overly similar industry matches. Only use search if you need fre
     @task
     def identify_collaboration_opportunities(self) -> Task:
         return Task(
-            description="""You are given two structured inputs: '{brand_data}' and '{plastic_data}'.
+            description="""Analyze the provided brand data '{brand_data}' and plastic material data '{plastic_data}' 
+to generate up to 5 innovative cross-industry physical product collaboration recommendations.
 
-Your task is to recommend 5 creative **brand collaboration opportunities**.
+For each recommendation, provide:
+- brand_name: The collaborating brand name
+- brand_placement: List of 2-3 key positioning attributes (e.g., ["Premium quality", "Scandinavian design", "Sustainability leader"])
+- sustainability_placement: Their current sustainability positioning or commitment
+- product_assumptions: List of 2-4 specific physical product concepts that could work (e.g., ["Chair", "Toy", "Shoe"])
+- collaboration_summary: 2-3 sentence description explaining the collaboration concept and its strategic value
+- estimated_impact: Estimated potential environmental or market impact in millions (revenue, carbon savings, etc.)
+- confidence_score: Your confidence in this recommendation on a scale of 1-100
+- combined_reach: Combined marketing reach of both brands in millions (social media followers, customers, newsletter subscribers, etc.)
 
-Each recommendation must:
-- Feature a **brand from a different industry** than the input brand.
-- Include a **product concept** that meaningfully combines the brand identity, the collaborator’s identity, and the plastic material (symbolically or functionally).
-- Include a **rationale** grounded in storytelling, emotional resonance, or shared brand ethos — not just shared sustainability focus.
+Focus exclusively on physical, manufacturable products. Consider:
+- How the plastic material's properties enable unique product features
+- How the collaboration enhances both brands' market positioning
+- Realistic manufacturing and distribution considerations
+- Consumer appeal and willingness to purchase
 
-Use the plastic material as a storytelling or innovation anchor (e.g., upcycled, symbolic, functional).
-
-You may search **once** for inspiration (e.g., "iconic toy brands", "youth tech brands", or "eco-luxury fashion").
-
-Avoid:
-- Recommending brands in the same or very similar industry.
-- Generic or obvious matches based purely on sustainability.
-
-Think like a **brand innovation strategist** at a global agency developing high-visibility, cross-industry collabs.
-
-Use this output format:
-
-{
-  "input_summary": {
-    "brand": "Brief brand name and industry",
-    "plastic": "Plastic type and one key property"
-  },
-  "top_collaborating_brands": [
-    {
-      "name": "string",
-      "industry": "string",
-      "rationale": "Why this brand is a creative and strategic match",
-      "product_concept": "Surprising or emotionally resonant joint product idea using the plastic"
-    }
-  ]
-}
-
-Only return 5 brands. Less is okay if it improves creativity and quality.
-""",
+Prioritize collaborations that create genuine value for both brands and demonstrate clear sustainability benefits.""",
             agent=self.collaboration_strategist(),
-            expected_output="""Use this exact format:
+            expected_output="""Return your output using this format exactly:
 
 {
   "input_summary": {
-    "brand": "Brief brand name and industry",
-    "plastic": "Plastic type and one key property"
+    "brand": "string",
+    "plastic": "string"
   },
-  "top_collaborating_brands": [
+  "top_collaborations": [
     {
-      "name": "string",
-      "industry": "string",
-      "rationale": "Why this brand is a good match",
-      "product_concept": "Brief idea for a joint product"
+      "brand_name": "string",
+      "brand_placement": ["string", ...],
+      "sustainability_placement": "string",
+      "product_assumptions": ["string", ...],
+      "collaboration_summary": "string"
+      "estimated_impact": "int"
+    "confidence_score": "int"
+    "combined_reach":t "int"
     }
   ]
 }
 
-Return exactly 5 if confident, else fewer high-quality matches.
-""",
+Return up to 5 ideas max. Only include physical products that make sense given the brands and plastic properties.
+"""
+,
             output_pydantic=CollaborationOutput
         )
 
