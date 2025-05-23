@@ -31,11 +31,9 @@ class BrandAnalystCrew:
         try:
             logger.logger.info("Creating Sustainability Brand Researcher agent")
             return Agent(
-                role="Sustainability Brand Researcher",
-                goal="Identify a brand's plastic use, sustainability initiatives, and regional operations with minimal queries",
-                backstory="""You are an expert in brand sustainability analysis, capable of extracting valuable insights
-                from a single comprehensive search. Your research helps identify potential collaboration opportunities
-                between brands based on material usage and geographic reach.""",
+               role="Brand Similarity Research Expert",
+                goal="Extract clean, structured data that represents a brand's identity, material usage, and sustainability philosophy for vector matching.",
+                backstory="""You specialize in researching and summarizing brand identities for semantic comparison. Your research helps match brands with similar products, values, materials, and markets.""",
                 tools=[SerperDevTool()],
                 verbose=True,
                 allow_delegation=False
@@ -50,21 +48,25 @@ class BrandAnalystCrew:
             logger.logger.info("Creating analyze_target_brand task")
             return Task(
                 description="""
-                Research the brand '{brand}' using ONLY ONE smart search query:
-                Example: "{brand} sustainability initiatives plastic usage collaborations manufacturing regions"
+               Using only one intelligent web search (e.g., "{brand} sustainability philosophy plastic materials manufacturing regions"),
+extract and return the following fields in JSON:
 
-                Extract from the first result only:
-                1. Brand industry and core product categories
-                2. Any plastic materials the brand uses or recycles
-                3. Any past or current sustainability collaborations
-                4. Their operational or manufacturing regions
-                
-                If 'location' is given, prefer sources relevant to that region.
-                
-                DO NOT perform more than one query. DO NOT infer data.
+{
+  "brand": "{brand}",
+  "industry": "e.g., automotive, sportswear",
+  "product_categories": ["e.g., sneakers", "sportswear"],
+  "plastic_materials": ["e.g., PET", "EVA foam", "TPU"],
+  "sustainability_philosophy": "e.g., circular economy, carbon-neutral by 2030, zero waste",
+  "key_partners_or_collaborators": ["e.g., Parley for the Oceans", "UNEP"],
+  "manufacturing_regions": ["e.g., Europe", "Southeast Asia"],
+  "brand_positioning": "e.g., luxury performance, eco-friendly mass market"
+}
+
+Only extract confirmed information from a reliable source like the brand's site or a news article.
+Prefer sources relevant to '{location}' if provided.
                 """,
                 agent=self.brand_researcher(),
-                expected_output="A JSON string representing a BrandProfile with the brand's industry, products, sustainability initiatives, plastic materials, collaborations, and regions.",
+                expected_output="A clean JSON string compatible with the BrandProfile schema for vector embedding.",
                 output_pydantic=BrandProfile
             )
         except Exception as e:

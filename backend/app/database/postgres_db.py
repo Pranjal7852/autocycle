@@ -37,17 +37,18 @@ class PostgresManager:
                 # Brands table updated to include industry
                 cur.execute("""
                 CREATE TABLE IF NOT EXISTS brands (
-                    id SERIAL PRIMARY KEY,
-                    brand_id TEXT UNIQUE NOT NULL,
-                    name TEXT NOT NULL,
-                    industry TEXT,
-                    main_products JSONB,
-                    sustainability_initiatives JSONB,
-                    plastic_materials_used JSONB,
-                    past_collaborations JSONB,
-                    operational_regions JSONB,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+                id SERIAL PRIMARY KEY,
+                brand_id TEXT UNIQUE NOT NULL,
+                name TEXT NOT NULL,
+                industry TEXT,
+                product_categories JSONB,
+                plastic_materials JSONB,
+                sustainability_philosophy TEXT,
+                key_partners_or_collaborators JSONB,
+                manufacturing_regions JSONB,
+                brand_positioning TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
             """)
 
                 # Plastic types table with JSONB fields for properties & applications
@@ -69,34 +70,38 @@ class PostgresManager:
 
     def store_brand_data(self, brand_data: Dict) -> Optional[str]:
         conn = self._get_connection()
-        print("POSTGRESS INSERT DEBUG - brand_data:", brand_data)
+        print("POSTGRES INSERT DEBUG - brand_data:", brand_data)
         try:
             with conn.cursor() as cur:
                 cur.execute("""
                     INSERT INTO brands (
                         brand_id, name, industry,
-                        main_products, sustainability_initiatives,
-                        plastic_materials_used, past_collaborations,
-                        operational_regions
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        product_categories, plastic_materials,
+                        sustainability_philosophy,
+                        key_partners_or_collaborators,
+                        manufacturing_regions,
+                        brand_positioning
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (brand_id) DO UPDATE SET
                         name = EXCLUDED.name,
                         industry = EXCLUDED.industry,
-                        main_products = EXCLUDED.main_products,
-                        sustainability_initiatives = EXCLUDED.sustainability_initiatives,
-                        plastic_materials_used = EXCLUDED.plastic_materials_used,
-                        past_collaborations = EXCLUDED.past_collaborations,
-                        operational_regions = EXCLUDED.operational_regions
+                        product_categories = EXCLUDED.product_categories,
+                        plastic_materials = EXCLUDED.plastic_materials,
+                        sustainability_philosophy = EXCLUDED.sustainability_philosophy,
+                        key_partners_or_collaborators = EXCLUDED.key_partners_or_collaborators,
+                        manufacturing_regions = EXCLUDED.manufacturing_regions,
+                        brand_positioning = EXCLUDED.brand_positioning
                     RETURNING brand_id
                 """, (
                     brand_data.get("brand_id"),
                     brand_data.get("name"),
                     brand_data.get("industry"),
-                    Json(brand_data.get("main_products")),
-                    Json(brand_data.get("sustainability_initiatives")),
-                    Json(brand_data.get("plastic_materials_used")),
-                    Json(brand_data.get("past_collaborations")),
-                    Json(brand_data.get("operational_regions")),
+                    Json(brand_data.get("product_categories")),
+                    Json(brand_data.get("plastic_materials")),
+                    brand_data.get("sustainability_philosophy"),
+                    Json(brand_data.get("key_partners_or_collaborators")),
+                    Json(brand_data.get("manufacturing_regions")),
+                    brand_data.get("brand_positioning")
                 ))
                 result = cur.fetchone()
                 return result[0] if result else None

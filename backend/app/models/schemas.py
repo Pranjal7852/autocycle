@@ -4,22 +4,23 @@ from typing import List, Dict, Optional
 class BrandProfile(BaseModel):
     brand_id: Optional[str] = None
     name: str
-    industry: Optional[str] = None
-    main_products: List[str]
-    sustainability_initiatives: List[str]
-    plastic_materials_used: List[str]
-    past_collaborations: List[str]
-    operational_regions: List[str]
+    industry: str
+    product_categories: List[str]
+    plastic_materials: List[str]
+    sustainability_philosophy: Optional[str]
+    key_partners_or_collaborators: List[str]
+    manufacturing_regions: List[str]
+    brand_positioning: Optional[str]
 
     def to_embedding_text(self) -> str:
         return (
-            f"Brand Name: {self.name}\n"
-            f"Industry: {self.industry}\n"
-            f"Main Products: {', '.join(self.main_products)}\n"
-            f"Sustainability Initiatives: {', '.join(self.sustainability_initiatives)}\n"
-            f"Plastic Materials Used: {', '.join(self.plastic_materials_used)}\n"
-            f"Past Collaborations: {', '.join(self.past_collaborations)}\n"
-            f"Operational Regions: {', '.join(self.operational_regions)}"
+            f"{self.name} is a brand in the {self.industry} industry.\n"
+            f"It primarily offers products such as: {', '.join(self.product_categories)}.\n"
+            f"The brand uses the following plastic materials: {', '.join(self.plastic_materials)}.\n"
+            f"Sustainability philosophy: {self.sustainability_philosophy or 'Not specified'}.\n"
+            f"Notable collaborations and partners include: {', '.join(self.key_partners_or_collaborators)}.\n"
+            f"Manufacturing and operational regions: {', '.join(self.manufacturing_regions)}.\n"
+            f"Its brand positioning is: {self.brand_positioning or 'Not specified'}."
         )
 
 class PlasticMaterialProfile(BaseModel):

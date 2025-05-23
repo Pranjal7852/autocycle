@@ -87,13 +87,9 @@ class DataManager:
             # Validate input data
             brand_model = BrandProfile(**brand_data)
             
-            # Generate stable ID if not provided
-            if not brand_model.brand_id:
-                namespace = uuid.UUID('12345678-1234-5678-1234-567812345678')  # Fixed namespace UUID
-                brand_id = self._generate_stable_id(namespace, brand_model.name)
-            else:
-                brand_id = brand_model.brand_id
-
+            namespace = uuid.UUID('12345678-1234-5678-1234-567812345678')  # Fixed namespace UUID
+            brand_id = self._generate_stable_id(namespace, brand_model.name)
+            
             if self.vector_db.object_exists("Brand", brand_id):
                 logger.info(f"Brand with ID {brand_id} already exists. Skipping insert.")
                 return brand_id 

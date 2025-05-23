@@ -1,7 +1,8 @@
 from crewai import Agent, Task, Crew, Process
 from crewai.project import CrewBase, agent, task, crew
+from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import SerperDevTool
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Dict
 import os
 import logging
@@ -18,57 +19,120 @@ logger = CrewLogger(
     console_output=True
 )
 
-# Pydantic Output
+# Pydantic Output Models
 class ProductIdea(BaseModel):
-    name: str
-    description: str
+    name: str = Field(..., description="Product name")
+    description: str = Field(..., description="Product description for creative teams")
+    creative_brief: str = Field(..., description="Brief for the creative pitch crew")
+    visual_description: str = Field(..., description="Description for the image generation crew")
 
 class ProductIdeasOutput(BaseModel):
-    products: List[ProductIdea]
+    input_summary: Dict[str, str] = Field(..., description="Summary of input brands and material")
+    products: List[ProductIdea] = Field(..., description="List of collaborative product ideas")
 
 @CrewBase
 class BrandProductIdeasCrew:
-    """Generates innovative product ideas combining two brands and a plastic material."""
+    """Generates product ideas for brand collaboration with briefs for downstream crews."""
+    
+    agents: List[BaseAgent]
+    tasks: List[Task]
+
+    def __init__(self):
+        self.logger = logger
 
     @agent
-    def idea_generator(self) -> Agent:
-        logger.logger.info("Creating product idea generator agent")
+    def product_conceptualizer(self) -> Agent:
+        logger.logger.info("Creating product conceptualizer agent")
         return Agent(
-            role="Creative Brand Collaborator",
-            goal="Invent 5 innovative, eco-friendly products that combine the essence of both brands using the specified plastic material.",
-            backstory="""You're a trend-setting product designer who thrives at the intersection of brand identity and sustainability.
-            Your expertise is in conceptualizing fan-favorite products that feel authentic to both companies.""",
+            role="Brand Collaboration Product Strategist",
+            goal="Generate viable collaborative product concepts and provide clear briefs for creative pitch and image generation teams.",
+            backstory="""You are a strategic product developer who specializes in brand collaborations. 
+            Your job is to identify realistic product opportunities that make sense for both brands and 
+            then provide clear, actionable briefs for the creative teams who will pitch and visualize these concepts.
+            
+            You think practically about what products could actually be manufactured using the given materials 
+            while staying true to both brand identities. You write concise, inspiring briefs that give 
+            creative teams everything they need to develop compelling pitches and visuals.
+            
+            You focus on products that feel natural and exciting, not forced partnerships.""",
             tools=[SerperDevTool()],
-            verbose=True,
+            verbose=False,
             allow_delegation=False
         )
 
     @task
-    def generate_ideas(self) -> Task:
-        logger.logger.info("Creating task to generate collaborative product ideas")
+    def generate_product_concepts(self) -> Task:
+        logger.logger.info("Creating task to generate product concepts with creative briefs")
         return Task(
             description="""
-            Based on the source brand data, target brand name, and plastic type, invent 5 collaborative product ideas.
+             Based on '{source_brand_data}', '{target_brand_data}', and '{plastic_data}', generate 5 collaborative product ideas.
+For each product, provide:
+- **Name**: Clear, brandable product name
+- **Description**: Concise product overview (30-40 words)
+- **Creative Brief**: What the pitch crew needs to know to sell this concept (key benefits, positioning, target market)
+- **Visual Description**: Brand aesthetic guidance for image generation - focus on which brand's core product to reimagine, key design elements from both brands, materials, and color palette suggestions
 
-            For each product, include:
-            - Name
-            - Short description (max 50 words)
+Focus on products that:
+- Take an iconic item from one brand and reimagine it with the other's aesthetic
+- Use the plastic material meaningfully in the design
+- Could realistically be manufactured
+- Represent clear brand DNA fusion
 
-            These products should blend elements of both brands and creatively integrate the use of the given plastic material.
-            Format your final answer as a list of JSON objects.
-            """,
-            expected_output="A JSON list of 5 products with 'name' and 'description'.",
-            output_pydantic=ProductIdeasOutput,
-            agent=self.idea_generator()
+For visual descriptions, think about:
+- Which brand contributes the base product form
+- Which brand contributes the design aesthetic/technology
+- How the plastic material influences the look and feel
+- Suggested color palette that blends both brand identities
+
+Output format:
+
+{
+  "input_summary": {
+    "brand_1": "First brand name and core identity",
+    "brand_2": "Second brand name and core identity", 
+    "plastic_material": "Plastic type and key manufacturing properties"
+  },
+  "products": [
+    {
+      "name": "string",
+      "description": "string",
+      "creative_brief": "string",
+      "visual_description": "string"
+    }
+  ]
+}
+
+Generate exactly 5 products that represent the best collaboration opportunities.""",
+            agent=self.product_conceptualizer(),
+            expected_output="""Return a JSON object with this structure:
+
+{
+  "input_summary": {
+    "brand_1": "string",
+    "brand_2": "string", 
+    "plastic_material": "string"
+  },
+  "products": [
+    {
+      "name": "string",
+      "description": "string (30-40 words)",
+      "creative_brief": "string (pitch-focused)",
+      "visual_description": "string (brand aesthetic guidance)"
+    }
+  ]
+}
+
+Provide exactly 5 well-considered product concepts with clear downstream briefs.""",
+            output_pydantic=ProductIdeasOutput
         )
 
     @crew
     def crew(self) -> Crew:
         return Crew(
-            agents=[self.idea_generator()],
-            tasks=[self.generate_ideas()],
-            process=Process.sequential,
-            verbose=True
+        agents=[self.product_conceptualizer()],
+        tasks=[self.generate_product_concepts()],
+        process=Process.sequential,
+        verbose=True
         )
 
     async def kickoff(self, input_data: Dict) -> Dict:
@@ -79,7 +143,7 @@ class BrandProductIdeasCrew:
             crew_instance = self.crew()
             result = await crew_instance.kickoff_async(inputs=input_data)
             logger.logger.info(f"Product ideas generation completed: {result}")
-            return result
+            return result.to_dict()
         except Exception as e:
             logger.logger.error(f"Error generating product ideas: {str(e)}")
             raise

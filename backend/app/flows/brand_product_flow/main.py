@@ -144,12 +144,12 @@ class BrandProductFlow(Flow[BrandProductState]):
             logger.logger.error(f"Error researching source brand: {e}")
             return "source_brand_research_failed"
     
-    @router(action_conduct_source_brand_research)
+    @router("action_conduct_source_brand_research")
     async def route_after_source_brand_research(self):
         logger.logger.info(f"Inside Router after research: {self.state.source_brand_results}")
         try:
             logger.logger.info(f"Storing Brand Info After research: {self.state.source_brand_results}")
-            await self.data_manager.add_brand_data(self.state.source_brand_results)
+            self.data_manager.add_brand_data(self.state.source_brand_results)
             self.state.source_brand_saved_to_db = True
             return "source_brand_research_complete"
         except Exception as e:
@@ -163,10 +163,12 @@ class BrandProductFlow(Flow[BrandProductState]):
             
             if self.state.location:
                 input_data["location"] = self.state.location
-            
+            print("DEBUG-1")
             result = await self.brand_research_crew.kickoff(input_data=input_data)
-        
+            print("DEBUG", type(result))
+            print("DEBUG2", result)
             self.state.target_brand_results = result.to_dict()
+            print("DEBUG3", result.to_dict())
             self.state.target_brand_research_complete = True
             # Return the string event name to trigger next step
             return result
@@ -180,7 +182,7 @@ class BrandProductFlow(Flow[BrandProductState]):
         logger.logger.info(f"Inside Router after research: {self.state.target_brand_results}")
         try:
             logger.logger.info(f"Storing Brand Info After research: {self.state.target_brand_results}")
-            await self.data_manager.add_brand_data(self.state.target_brand_results)
+            self.data_manager.add_brand_data(self.state.target_brand_results)
             self.state.target_brand_saved_to_db = True
             return "target_brand_research_complete"
         except Exception as e:
@@ -209,12 +211,13 @@ class BrandProductFlow(Flow[BrandProductState]):
         logger.logger.info(f"Inside Router after plastic research: {self.state.plastic_results}")
         try:
             logger.logger.info(f"Storing Plastic Info After research: {self.state.plastic_results}")
-            await self.data_manager.add_plastic_data(self.state.plastic_results)
+            self.data_manager.add_plastic_data(self.state.plastic_results)
             self.state.plastic_saved_to_db = True
             return "plastic_research_complete"
         except Exception as e:
             logger.logger.error(f"Error storing plastic: {e}")
             return {"plastic_storing": "failed", "error": str(e)}
+    
 
     @listen(and_("source_brand_research_complete","target_brand_research_complete", "plastic_research_complete"))
     async def process_product_ideas(self):

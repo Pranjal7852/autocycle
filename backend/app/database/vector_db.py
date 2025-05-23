@@ -127,7 +127,15 @@ class VectorDBManager:
             raise
 
     def search_brand(self, query: str, limit: int = 3):
-        embedding_text = f"Brand Name: {query}".lower()  
+        embedding_text = (
+    f"{query.lower()} is a global brand in its respective industry.\n"
+    f"It offers products or services aligned with its market positioning.\n"
+    f"It may use or recycle plastic materials in its operations.\n"
+    f"It could be engaged in sustainability initiatives or ESG practices.\n"
+    f"It may collaborate with other brands or suppliers.\n"
+    f"It operates in specific regional or global markets.\n"
+    f"Its brand positioning may be premium, eco-conscious, or mainstream."
+)
         query_embedding = self.model.encode(embedding_text)
         results = (
             self.client.collections.get("Brand")
