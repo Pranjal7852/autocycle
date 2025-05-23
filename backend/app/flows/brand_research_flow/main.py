@@ -73,6 +73,7 @@ class ResearchFlow(Flow[BrandResearchState]):
         if similarity < self.similarity_threshold:
             self.state.brand_research_needed = True
         else:
+            self.state.brand_results["name"] = self.state.brand_name
             self.state.brand_research_complete = True
 
     async def check_plastic_database(self):

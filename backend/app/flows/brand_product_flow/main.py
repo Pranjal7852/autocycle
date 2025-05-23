@@ -91,6 +91,8 @@ class BrandProductFlow(Flow[BrandProductState]):
         if similarity < self.similarity_threshold:
             setattr(self.state, f"{role}_brand_research_needed", True)
         else:
+            if brand_data:
+                brand_data["name"] = brand_name
             setattr(self.state, f"{role}_brand_results", brand_data)
             setattr(self.state, f"{role}_brand_research_complete", True)
 
