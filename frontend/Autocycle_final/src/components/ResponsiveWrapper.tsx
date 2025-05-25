@@ -9,7 +9,7 @@ const ResponsiveWrapper: React.FC<ResponsiveWrapperProps> = ({ children }) => {
 
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsSmallScreen(window.innerWidth < 1200);
+      setIsSmallScreen(window.innerWidth < 100);
     };
 
     checkScreenSize(); // Initial check

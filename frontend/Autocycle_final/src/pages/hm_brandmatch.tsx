@@ -1,70 +1,124 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import BrandMatchCard from "@/components/BrandMatchCard";
 import FlowNavigator from "@/components/FlowNavigator";
 
-const cardsData = [
-  {
-    brand: "IKEA",
-    selectUrl: "/need-material/ikea-collaboration",
-    brandPlacement: "Sustainability Leadership, Low Prices, Scandinavian Design",
-    sustainabilityPlacement:
-      "Committed To Using Renewable And Recycled Materials And Aiming For Climate-Positive Operations By 2030.",
-    productAssumptions: "Containers, Chairs, Tables, Floor Protection",
-    materialMatch: "Recycled Plastic, FSC Wood", // <-- Added for compatibility
-    matchValue: "120.000€",
-    combinedReach: "20 Million",
-    annualVolume: "75 Tons"
-  },
-  {
-    brand: "LEGO",
-    selectUrl: "/need-material/lego-collaboration",
-    brandPlacement: "Creativity, Play, Learning, Global Icon",
-    sustainabilityPlacement:
-      "Innovating with bio-based and recycled materials for bricks and packaging, aiming for carbon-neutral operations.",
-    productAssumptions: "Bricks, Packaging, Educational Kits",
-    materialMatch: "Bio-based ABS, Recycled PET", // <-- Added
-    matchValue: "95.000€",
-    combinedReach: "30 Million",
-    annualVolume: "60 Tons"
-  },
-  {
-    brand: "DECATHLON",
-    selectUrl: "/need-material/decathlon-collaboration",
-    brandPlacement: "Affordable Sports, Innovation, Mass Market",
-    sustainabilityPlacement:
-      "Focused on sustainable product design and circular economy in sports equipment.",
-    productAssumptions: "Sports Equipment, Outdoor Gear",
-    materialMatch: "Recycled Nylon, Thermoplastics", // <-- Added
-    matchValue: "110.000€",
-    combinedReach: "18 Million",
-    annualVolume: "80 Tons"
+interface CollaborationBrand {
+  brand_name: string;
+  brand_placement: string[];
+  sustainability_placement: string;
+  product_assumptions: string[];
+  collaboration_summary: string;
+  estimated_impact: number;
+  confidence_score: number;
+  combined_reach: number;
+  logo_url: string;
+  company_domain: string;
+}
+
+interface GenerateBrandResponse {
+  status: "success" | "error";
+  result?: {
+    status: "collaboration_complete";
+    results: {
+      input_summary: {
+        brand: string;
+        plastic: string;
+      };
+      top_collaborations: CollaborationBrand[];
+    };
+  };
+  message?: string;
+}
+
+interface FormData {
+  materialType: string;
+  // Add other form fields as needed
+}
+
+const BrandMatch: React.FC = () => {
+  const { state } = useLocation();
+  const { formData, apiResponse } = state || {} as { formData: FormData; apiResponse: GenerateBrandResponse };
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000); // 1-second delay
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Loading screen
+  if (isLoading) {
+    return (
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-primary mx-auto"></div>
+          <p className="font-mulish text-lg text-primary mt-4">Loading brand matches...</p>
+        </div>
+      </div>
+    );
   }
-];
 
-const NeedMaterialBrandMatch = () => (
-  <div className="bg-background min-h-screen">
-    <div className="max-w-5xl mx-auto px-4 sm:px-8">
-      <FlowNavigator currentStep="brand" brandType="need" />
+  // Fallback if no data
+  if (!formData || !apiResponse || apiResponse.status !== "success" || !apiResponse.result?.results?.top_collaborations) {
+    return (
+      <div className="bg-background min-h-screen">
+        <div className="max-w-5xl mx-auto px-4 sm:px-8 py-12">
+          <FlowNavigator currentStep="brand" brandType="have" />
+          <h1 className="font-mulish text-2xl sm:text-3xl font-extrabold uppercase text-center text-primary mb-14">
+            Brand Match Results
+          </h1>
+          <p className="text-red-500 text-center">
+            {apiResponse?.message || "No data available. Please complete the form first."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-      <h1 className="font-mulish text-2xl sm:text-3xl font-extrabold uppercase text-center text-primary mb-14">
-        All set. Your results are ready to explore
-      </h1>
-      <div className="flex flex-col gap-10">
-        {cardsData.map((card, idx) => (
-          <BrandMatchCard
-            key={card.brand + idx}
-            brand={card.brand}
-            selectUrl={card.selectUrl}
-            assumptions={card.productAssumptions}
-            materialMatch={card.materialMatch}
-            matchValue={card.matchValue}
-            combinedReach={card.combinedReach}
-            annualVolume={card.annualVolume}
-          />
-        ))}
+  // Map API data to BrandMatchCard props
+  const cardsData = apiResponse.result.results.top_collaborations.map((collab) => ({
+    brand: collab.brand_name,
+    selectUrl: `/have-material/${collab.brand_name.toLowerCase().replace(/\s/g, "-")}`,
+    brandPlacement: collab.brand_placement.join(", "),
+    sustainabilityPlacement: collab.sustainability_placement,
+    productAssumptions: collab.product_assumptions.join(", "),
+    estimatedImpact: `${collab.estimated_impact}M Tons`,
+    combinedReach: `${collab.combined_reach}M People`,
+    confidenceScore: `${collab.confidence_score}.00%`,
+    logoUrl: collab.logo_url,
+    companyDomain: collab.company_domain,
+  }));
+
+  return (
+    <div className="bg-background min-h-screen">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-12">
+        <FlowNavigator currentStep="brand" brandType="have" />
+        <h1 className="font-mulish text-2xl sm:text-3xl font-extrabold uppercase text-center text-primary mb-14">
+          All set. Your results are ready to explore
+        </h1>
+        <div className="flex flex-col gap-10">
+          {cardsData.map((card, idx) => (
+            <BrandMatchCard
+              key={card.brand + idx}
+              brand={card.brand}
+              selectUrl={card.selectUrl}
+              brandPlacement={card.brandPlacement}
+              sustainabilityPlacement={card.sustainabilityPlacement}
+              productAssumptions={card.productAssumptions}
+              estimatedImpact={card.estimatedImpact}
+              combinedReach={card.combinedReach}
+              confidenceScore={card.confidenceScore}
+              logoUrl={card.logoUrl}
+              companyDomain={card.companyDomain}
+            />
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
-export default NeedMaterialBrandMatch;
+export default BrandMatch;

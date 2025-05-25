@@ -1,17 +1,32 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const BrandMatchCard = ({
+interface BrandMatchCardProps {
+  brand: string;
+  selectUrl: string;
+  brandPlacement: string;
+  sustainabilityPlacement: string;
+  productAssumptions: string;
+  estimatedImpact: string;
+  combinedReach: string;
+  confidenceScore: string;
+  logoUrl: string;
+  companyDomain: string;
+}
+
+const BrandMatchCard: React.FC<BrandMatchCardProps> = ({
   brand,
   selectUrl,
   brandPlacement,
   sustainabilityPlacement,
   productAssumptions,
-  matchValue,
+  estimatedImpact,
   combinedReach,
-  annualVolume,
+  confidenceScore,
+  logoUrl,
+  companyDomain,
 }) => (
-  <div className="relative flex flex-col md:flex-row w-full max-w-4xl min-h-[420px] border border-black mx-auto mt-10 mb-14 bg-white">
+  <div className="relative flex w-full max-w-4xl min-h-[490px] border border-black mx-auto mt-10 mb-14 bg-white">
     {/* Select Button */}
     <Link
       to={selectUrl}
@@ -20,13 +35,37 @@ const BrandMatchCard = ({
     >
       Select
       <svg width="28" height="28" viewBox="0 0 28 28" className="ml-1">
-        <path d="M8 20L20 8M20 8H9M20 8V19" stroke="white" strokeWidth="2"/>
+        <path d="M8 20L20 8M20 8H9M20 8V19" stroke="white" strokeWidth="2" />
       </svg>
     </Link>
 
-    {/* Card Content */}
-    <div className="flex-1 px-8 pt-10 pl-[280px] pb-10 flex-col">
-      {/* Brand Placement */}
+    {/* Left Side - Image and Brand Name */}
+    <div className="flex flex-col justify-between w-80 relative">
+      {/* Brand Logo and Domain */}
+      <div className="p-8 pb-4">
+        {logoUrl && (
+          <img src={logoUrl} alt={`${brand} logo`} className="h-[100%] w-auto mb-4" />
+        )}
+      
+      </div>
+
+      {/* Brand Name, Bottom Left */}
+      <div className="absolute -left-10 -bottom-5 bg-white">
+        <a
+          href={`https://${companyDomain}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+        <span className="text-[72px] md:text-[120px] font-extrabold uppercase leading-none tracking-wide text-black whitespace-nowrap">
+          {brand}
+        </span>
+        </a>
+      </div>
+    </div>
+
+    {/* Right Side - Content */}
+    <div className="flex-1 px-8 pt-10 pb-10 flex flex-col space-y-6">
       <div>
         <div className="uppercase font-bold text-sm tracking-wider text-gray-400 mb-1">
           Brand Placement
@@ -35,6 +74,7 @@ const BrandMatchCard = ({
           {brandPlacement}
         </div>
       </div>
+
       {/* Sustainability Placement */}
       <div>
         <div className="uppercase font-bold text-sm tracking-wider text-gray-400 mb-1">
@@ -44,6 +84,7 @@ const BrandMatchCard = ({
           {sustainabilityPlacement}
         </div>
       </div>
+
       {/* Product Assumptions */}
       <div>
         <div className="uppercase font-bold text-sm tracking-wider text-gray-400 mb-1">
@@ -53,14 +94,9 @@ const BrandMatchCard = ({
           {productAssumptions}
         </div>
       </div>
+
       {/* Stats */}
       <div className="flex gap-10 md:gap-12 mt-4 flex-wrap">
-        <div>
-          <div className="uppercase text-xs font-extrabold text-gray-400 tracking-wider mb-1">
-            Match Value
-          </div>
-          <div className="text-lg text-black">{matchValue}</div>
-        </div>
         <div>
           <div className="uppercase text-xs font-extrabold text-gray-400 tracking-wider mb-1">
             Combined Reach
@@ -69,19 +105,19 @@ const BrandMatchCard = ({
         </div>
         <div>
           <div className="uppercase text-xs font-extrabold text-gray-400 tracking-wider mb-1">
-            Annual Plastic Volume
+            CO2 Saved
           </div>
-          <div className="text-lg text-black">{annualVolume}</div>
+          <div className="text-lg text-black">{estimatedImpact}</div>
+        </div>
+        <div>
+          <div className="uppercase text-xs font-extrabold text-gray-400 tracking-wider mb-1">
+            Confidence Score
+          </div>
+          <div className="text-lg text-black">{confidenceScore}</div>
         </div>
       </div>
     </div>
-
-    {/* Brand Name, Bottom Left */}
-    <div className="absolute -left-5 -bottom-5 bg-white">
-      <span className="text-[72px] md:text-[120px] font-extrabold uppercase leading-none tracking-wide text-black md:mb-0 mb-[-1em]">
-        {brand}
-      </span>
-    </div>
   </div>
 );
+
 export default BrandMatchCard;

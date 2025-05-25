@@ -4,11 +4,19 @@ from datetime import datetime
 from dotenv import load_dotenv
 from app.flows.brand_research_flow.main import brand_research_kickoff
 from app.flows.brand_product_flow.main import brand_product_kickoff
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # Allow your frontend origin
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS"],  # Allow POST and OPTIONS for preflight
+    allow_headers=["Content-Type"],  # Allow Content-Type header
+)
 class GenerateBrandRequest(BaseModel):
     brand: str
     plastic_type: str
