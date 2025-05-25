@@ -1,19 +1,36 @@
-# Use an official Python runtime as a parent image
-FROM python:3.10
+# Use a Conda base image
+FROM continuumio/miniconda3
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy the requirements.txt file (if you have one) and install any dependencies
-# In this case, you'll install FastAPI and Uvicorn to run the app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy environment.yml to define dependencies
+COPY environment.yml .
 
-# Copy the current directory contents into the container at /app
+# Create Conda environment from environment.yml
+RUN conda env create -f environment.yml && \
+    conda clean --all --yes
+
+# Activate the Conda environment by default
+# Modify the shell to source Conda
+SHELL ["/bin/bash", "--login", "-c"]
+
+# Copy application code
 COPY . .
 
-# Expose the port that FastAPI will be running on (default is 8000)
+# Create non-root user for security
+RUN useradd -m appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Create logs directory with correct permissions
+RUN mkdir -p /app/logs && chown -R appuser:appuser /app/logs
+
+# Expose port (based on your original Dockerfile)
 EXPOSE 8000
 
-# Command to run the FastAPI app using Uvicorn
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Set environment variables for Python
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Run the application using Conda environment
+CMD ["conda", "run", "--no-capture-output", "-n", "myenv", "python", "run.py"]

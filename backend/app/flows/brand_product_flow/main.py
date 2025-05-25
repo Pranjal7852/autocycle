@@ -4,8 +4,7 @@ from crewai.flow import Flow, listen, start, router, and_
 from app.crews.brand_analyst.brand_analyst import BrandAnalystCrew
 from app.crews.plastic_analyst.plastic_analyst import PlasticAnalystCrew
 from app.flows.brand_product_flow.crews.brand_product_ideas.brand_product_ideas import BrandProductIdeasCrew
-from app.flows.brand_product_flow.crews.product_pitch_generator.product_pitch_generator import ProductPitchCrew
-from app.flows.brand_product_flow.crews.product_image_generator.product_image_generator import ProductImageCrew
+from app.flows.brand_product_flow.crews.brand_product_developer.brand_product_developer import BrandProductDevelopers
 from app.utils.db_queries import DataManager
 from typing import Dict
 import asyncio
@@ -59,8 +58,7 @@ class BrandProductFlow(Flow[BrandProductState]):
         self.brand_research_crew = BrandAnalystCrew()
         self.plastic_research_crew = PlasticAnalystCrew()
         self.ideator_crew = BrandProductIdeasCrew()
-        self.pitcher_crew = ProductPitchCrew()
-        self.image_crew = ProductImageCrew()
+        self.product_crew = BrandProductDevelopers()
         self.similarity_threshold = 0.8
 
     @start()
@@ -165,12 +163,8 @@ class BrandProductFlow(Flow[BrandProductState]):
             
             if self.state.location:
                 input_data["location"] = self.state.location
-            print("DEBUG-1")
             result = await self.brand_research_crew.kickoff(input_data=input_data)
-            print("DEBUG", type(result))
-            print("DEBUG2", result)
             self.state.target_brand_results = result.to_dict()
-            print("DEBUG3", result.to_dict())
             self.state.target_brand_research_complete = True
             # Return the string event name to trigger next step
             return result
@@ -231,11 +225,57 @@ class BrandProductFlow(Flow[BrandProductState]):
             }
             combined_results = await self.ideator_crew.kickoff(input_data=input_data)
             self.state.product_ideas = combined_results
-            return {"status": "product_ideas_complete", "results": combined_results}
+            return combined_results
         except Exception as e:
             logger.logger.error(f"Error in product ideas: {e}")
             return {"status": "product_ideas_failed", "error": str(e)}
 
+    @listen("process_product_ideas")
+    async def process_product_development_v2(self):
+        try:
+            product_ideas = self.state.product_ideas["products"]
+            
+            # Create coroutines for parallel execution
+            coroutines = [
+                self.product_crew.kickoff({
+                    "brand": self.state.source_brand,
+                    "target_brand": self.state.target_brand,
+                    "product_type": product.get("product_type", ""),
+                    "product_name": product["name"],
+                    "product_description": product.get("description", "")
+                })
+                for product in product_ideas
+            ]
+            
+            # Execute all coroutines in parallel
+            all_results = await asyncio.gather(*coroutines, return_exceptions=True)
+            
+            # Process results
+            processed_results = []
+            for i, result in enumerate(all_results):
+                if isinstance(result, Exception):
+                    processed_results.append({
+                        "product_name": product_ideas[i]["name"],
+                        "status": "failed",
+                        "error": str(result)
+                    })
+                else:
+                    processed_results.append({
+                        "product_name": product_ideas[i]["name"],
+                        "status": "success",
+                        "result": result
+                    })
+
+            return {
+                "status": "product_development_complete",
+                "results": processed_results
+            }
+        except Exception as e:
+            logger.logger.error(f"Error in product development: {e}")
+            return {
+                "status": "product_development_failed",
+                "error": str(e)
+            }
 
 async def brand_product_kickoff(source_brand: str = "", plastic_type: str = "", location: str = "", target_brand: str = ""):
     data_manager = DataManager()

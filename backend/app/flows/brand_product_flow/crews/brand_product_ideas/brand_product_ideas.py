@@ -1,7 +1,6 @@
 from crewai import Agent, Task, Crew, Process
 from crewai.project import CrewBase, agent, task, crew
 from crewai.agents.agent_builder.base_agent import BaseAgent
-from crewai_tools import SerperDevTool
 from pydantic import BaseModel, Field
 from typing import List, Dict
 import os
@@ -21,14 +20,14 @@ logger = CrewLogger(
 
 # Pydantic Output Models
 class ProductIdea(BaseModel):
-    name: str = Field(..., description="Product name")
-    description: str = Field(..., description="Product description for creative teams")
-    creative_brief: str = Field(..., description="Brief for the creative pitch crew")
-    visual_description: str = Field(..., description="Description for the image generation crew")
+    product_type: str = Field(..., description="Type or category of the product")
+    name: str = Field(..., description="Product name (2-3 words)")
+    description: str = Field(..., description="Product description (30-40 words)")
 
 class ProductIdeasOutput(BaseModel):
     input_summary: Dict[str, str] = Field(..., description="Summary of input brands and material")
     products: List[ProductIdea] = Field(..., description="List of collaborative product ideas")
+
 
 @CrewBase
 class BrandProductIdeasCrew:
@@ -55,8 +54,8 @@ class BrandProductIdeasCrew:
             creative teams everything they need to develop compelling pitches and visuals.
             
             You focus on products that feel natural and exciting, not forced partnerships.""",
-            tools=[SerperDevTool()],
-            verbose=False,
+           
+            verbose=True,
             allow_delegation=False
         )
 
@@ -65,74 +64,70 @@ class BrandProductIdeasCrew:
         logger.logger.info("Creating task to generate product concepts with creative briefs")
         return Task(
             description="""
-             Based on '{source_brand_data}', '{target_brand_data}', and '{plastic_data}', generate 5 collaborative product ideas.
-For each product, provide:
-- **Name**: Clear, brandable product name
-- **Description**: Concise product overview (30-40 words)
-- **Creative Brief**: What the pitch crew needs to know to sell this concept (key benefits, positioning, target market)
-- **Visual Description**: Brand aesthetic guidance for image generation - focus on which brand's core product to reimagine, key design elements from both brands, materials, and color palette suggestions
+            Using the provided database information for '{source_brand_data}', '{target_brand_data}', and '{plastic_data}', generate 2 collaborative product ideas.
+            For each product, provide:
+            - **Product Type**: The category or type of product (e.g., accessory, wearable, furniture)
+            - **Name**: Clear, brandable product name (5-6 words)
+            - **Description**: Concise product overview (30-40 words)
 
-Focus on products that:
-- Take an iconic item from one brand and reimagine it with the other's aesthetic
-- Use the plastic material meaningfully in the design
-- Could realistically be manufactured
-- Represent clear brand DNA fusion
+            Focus on products that:
+            - Take an iconic item from one brand and reimagine it with the other's aesthetic
+            - Use the plastic material meaningfully in the design
+            - Could realistically be manufactured
+            - Represent clear brand DNA fusion
 
-For visual descriptions, think about:
-- Which brand contributes the base product form
-- Which brand contributes the design aesthetic/technology
-- How the plastic material influences the look and feel
-- Suggested color palette that blends both brand identities
+            For visual descriptions, think about:
+            - Which brand contributes the base product form
+            - Which brand contributes the design aesthetic/technology
+            - How the plastic material influences the look and feel
+            - Suggested color palette that blends both brand identities
 
-Output format:
+            Output format:
+            {
+                "input_summary": {
+                    "brand_1": "string",
+                    "brand_2": "string",
+                    "plastic_material": "string"
+                },
+                "products": [
+                    {
+                        "product_type": "string",
+                        "name": "string",
+                        "description": "string (30-40 words)"
+                    }
+                ]
+            }
 
-{
-  "input_summary": {
-    "brand_1": "First brand name and core identity",
-    "brand_2": "Second brand name and core identity", 
-    "plastic_material": "Plastic type and key manufacturing properties"
-  },
-  "products": [
-    {
-      "name": "string",
-      "description": "string",
-      "creative_brief": "string",
-      "visual_description": "string"
-    }
-  ]
-}
-
-Generate exactly 5 products that represent the best collaboration opportunities.""",
+            Generate exactly 2 products that represent the best collaboration opportunities.""",
             agent=self.product_conceptualizer(),
             expected_output="""Return a JSON object with this structure:
 
-{
-  "input_summary": {
-    "brand_1": "string",
-    "brand_2": "string", 
-    "plastic_material": "string"
-  },
-  "products": [
-    {
-      "name": "string",
-      "description": "string (30-40 words)",
-      "creative_brief": "string (pitch-focused)",
-      "visual_description": "string (brand aesthetic guidance)"
-    }
-  ]
-}
+            {
+              "input_summary": {
+                "brand_1": "string",
+                "brand_2": "string",
+                "plastic_material": "string"
+              },
+              "products": [
+                {
+                  "product_type": "string",
+                  "name": "string",
+                  "description": "string (30-40 words)"
+                }
+              ]
+            }
 
-Provide exactly 5 well-considered product concepts with clear downstream briefs.""",
+            Provide exactly 2 well-considered product concepts.""",
             output_pydantic=ProductIdeasOutput
         )
 
     @crew
     def crew(self) -> Crew:
         return Crew(
-        agents=[self.product_conceptualizer()],
-        tasks=[self.generate_product_concepts()],
-        process=Process.sequential,
-        verbose=True
+            agents=[self.product_conceptualizer()],
+            tasks=[self.generate_product_concepts()],
+            process=Process.sequential,
+            verbose=True
         )
 
     async def kickoff(self, input_data: Dict) -> Dict:
