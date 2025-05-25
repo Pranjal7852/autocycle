@@ -113,6 +113,11 @@ const BrandMatch: React.FC = () => {
               confidenceScore={card.confidenceScore}
               logoUrl={card.logoUrl}
               companyDomain={card.companyDomain}
+              inputResponse={{
+                sourceBrand: formData.brand || "",
+                location: formData.location || "",
+                plasticType: formData.materialType || "",
+              }}
             />
           ))}
         </div>

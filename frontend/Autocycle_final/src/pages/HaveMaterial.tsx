@@ -48,6 +48,8 @@ const HaveMaterial: React.FC = () => {
         state: {
           formData,
           apiResponse: response,
+          inputResponse: { "sourceBrand": formData.brand, "location": formData.location, "plasticType": formData.plastic_type},
+
         },
       });
     } catch (err) {
