@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import BrandMatchCard from "@/components/BrandMatchCard";
 import FlowNavigator from "@/components/FlowNavigator";
+import { LoadingComponent } from "@/components/Loading";
 
 interface CollaborationBrand {
   brand_name: string;
@@ -40,8 +41,31 @@ interface FormData {
 const BrandMatch: React.FC = () => {
   const { state } = useLocation();
   const { formData, apiResponse, inputResponse } = state || {} as { formData: FormData; apiResponse: GenerateBrandResponse };
-  console.log("data eceived", inputResponse)
+  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+
+  console.log("data received", inputResponse);
   const collaborations = apiResponse?.result?.results?.top_collaborations || [];
+
+  // Handle when a card starts loading
+  const handleCardLoading = (isLoading: boolean) => {
+    setIsLoadingProducts(isLoading);
+  };
+
+  // Show loading component when any card is loading
+  if (isLoadingProducts) {
+    return (
+      <LoadingComponent
+        loadingTexts={[
+          "Generating product ideas for your collaboration...",
+          "Analyzing market potential and sustainability impact...",
+          "Creating innovative product concepts...",
+          "Almost there... Great things take a few seconds",
+          "Finalizing your collaboration results..."
+        ]}
+        textChangeInterval={2500}
+      />
+    );
+  }
 
   if (!formData || !apiResponse || apiResponse.status !== "success") {
     return (
@@ -91,6 +115,7 @@ const BrandMatch: React.FC = () => {
                 key={card.brand + idx}
                 {...card}
                 inputResponse={inputResponse}
+                onLoadingChange={handleCardLoading}
               />
             ))}
           </div>

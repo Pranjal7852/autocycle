@@ -70,21 +70,34 @@ export const useGenerateProducts = (): GenerateProductsHookResponse => {
     const submit = async (data: GenerateProductsData): Promise<GenerateProductsResponse> => {
         setError(null);
         setIsLoading(true);
-
+        console.log("received data", data)
         try {
             if (!data.location) {
                 throw new Error("Factory location is required.");
             }
 
-            const response = await new Promise<GenerateProductsResponse>((resolve) => {
-                setTimeout(() => {
-                    resolve(dummyResponse);
-                }, 1000);
+            const response = await fetch('http://0.0.0.0:8000/generateproducts', {
+                method: 'POST',
+                headers: {
+                    'accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    source_brand: data.source_brand,
+                    plastic_type: data.plastic_type,
+                    location: data.location,
+                    target_brand: data.target_brand
+                })
             });
 
+            if (!response.ok) {
+                throw new Error('Failed to generate products');
+            }
 
-            console.log("Returning dummy response", response);
-            return response;
+            const responseData = await response.json();
+
+            console.log("Returning API response", responseData);
+            return responseData;
         } catch (err) {
             const errorMessage = (err as Error).message || "Failed to submit form. Please try again.";
             setError(errorMessage);

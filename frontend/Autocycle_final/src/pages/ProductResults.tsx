@@ -26,7 +26,7 @@ interface LocationState {
       results: Product[];
     };
   };
-  inputData?: any; // define more precise type if you want
+  inputData?: any;
   combinedReach?: string;
   estimatedImpact?: string;
   confidenceScore?: string;
@@ -54,6 +54,7 @@ const ProductResults: React.FC = () => {
 
   const products = response.result.results;
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [showFullPitch, setShowFullPitch] = useState(false);
 
   const selectedProduct = products[selectedIndex].result;
 
@@ -128,12 +129,21 @@ const ProductResults: React.FC = () => {
 
             <div>
               <h4 className="uppercase text-xs font-bold text-muted-foreground mb-1 font-mulish">Pitch</h4>
-              <p className="text-lg">
+              <div
+                className={`prose prose-p:text-base prose-p:font-mulish prose-p:text-primary prose-headings:font-semibold prose-headings:text-muted-foreground prose-headings:uppercase prose-headings:text-xs prose-ul:pl-5 transition-all duration-300 ease-in-out ${showFullPitch ? "" : "max-h-[200px] overflow-hidden"
+                  }`}
+              >
                 <ReactMarkdown>{selectedProduct.pitch}</ReactMarkdown>
-                </p>
+              </div>
+              <button
+                className="mt-2 text-sm underline text-muted-foreground hover:text-primary"
+                onClick={() => setShowFullPitch((prev) => !prev)}
+              >
+                {showFullPitch ? "Show Less" : "Show More"}
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10 mt-6">
               <div>
                 <h4 className="uppercase text-xs font-bold text-muted-foreground mb-1 font-mulish">CO2 Saved</h4>
                 <p className="text-lg font-semibold">{userInput.estimatedImpact}</p>

@@ -5,11 +5,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import FlowNavigator from "@/components/FlowNavigator";
 import { useGenerateBrand } from "@/hooks/useGenerateBrand";
+import { useGenerateProducts } from "@/hooks/useGenerateProducts";
 import { LoadingComponent } from "@/components/Loading";
 
 const HaveMaterial: React.FC = () => {
   const navigate = useNavigate();
-  const { isLoading, error, submit } = useGenerateBrand();
+  const { isLoading: isGeneratingBrand, error: brandError, submit: submitBrand } = useGenerateBrand();
+  const { isLoading: isGeneratingProducts, error: productsError, submit: submitProducts } = useGenerateProducts(); // For collaboration flow
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     brand: "",
@@ -43,28 +45,67 @@ const HaveMaterial: React.FC = () => {
     setIsSubmitting(true); // Show loading screen
 
     try {
-      const response = await submit({
-        brand: formData.brand,
-        plastic_type: formData.plastic_type,
-        location: formData.location,
-      });
+      // Check if collaboration company is filled
+      const hasCollaborationCompany = formData.collaborationCompany.trim() !== "";
 
-      navigate("/brandmatch", {
-        state: {
-          formData,
-          apiResponse: response,
-          inputResponse: {
-            sourceBrand: formData.brand,
-            location: formData.location,
-            plasticType: formData.plastic_type,
+      if (hasCollaborationCompany) {
+        // Use the products hook for collaboration and redirect to product results
+        const response = await submitProducts({
+          source_brand: formData.brand,
+          plastic_type: formData.plastic_type,
+          location: formData.location,
+          target_brand: formData.collaborationCompany,
+        });
+
+        // Hard-coded values for now
+        const combinedReach = "2.5M users";
+        const estimatedImpact = "450 kg CO2";
+        const confidenceScore = "87%";
+
+        const inputData = {
+          sourceBrand: formData.brand,
+          location: formData.location,
+          plasticType: formData.plastic_type,
+        };
+
+        navigate("/product-results", {
+          state: {
+            response,
+            inputData,
+            combinedReach,
+            estimatedImpact,
+            confidenceScore
+          }
+        });
+      } else {
+        // Use the original brand hook and redirect to brand match page
+        const response = await submitBrand({
+          brand: formData.brand,
+          plastic_type: formData.plastic_type,
+          location: formData.location,
+        });
+
+        navigate("/brandmatch", {
+          state: {
+            formData,
+            apiResponse: response,
+            inputResponse: {
+              sourceBrand: formData.brand,
+              location: formData.location,
+              plasticType: formData.plastic_type,
+            },
           },
-        },
-      });
+        });
+      }
     } catch (err) {
-      // Handled in hook
+      // Handled in hooks
       setIsSubmitting(false);
     }
   };
+
+  // Determine which loading state to show
+  const isLoading = isGeneratingBrand || isGeneratingProducts;
+  const error = brandError || productsError;
 
   if (isSubmitting) {
     return <LoadingComponent />;

@@ -20,7 +20,7 @@ const FlowNavigator: React.FC<FlowNavigatorProps> = ({ currentStep, brandType })
     },
     {
       label: "Brands",
-      link: brandType === "have" ? "/hm_brandmatch" : "/nm_brandmatch",
+      link: brandType === "have" ? "/brandmatch" : "/brandmatch",
       key: "brand",
     },
     {

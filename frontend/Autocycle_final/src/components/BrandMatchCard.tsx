@@ -20,6 +20,7 @@ interface BrandMatchCardProps {
     plasticType: string;
   };
   onProductsGenerated?: (response: any) => void;
+  onLoadingChange?: (isLoading: boolean) => void;
 }
 
 const BrandMatchCard: React.FC<BrandMatchCardProps> = ({
@@ -35,15 +36,24 @@ const BrandMatchCard: React.FC<BrandMatchCardProps> = ({
   companyDomain,
   inputResponse,
   onProductsGenerated,
+  onLoadingChange,
 }) => {
   const navigate = useNavigate();
   const { isLoading, error, submit } = useGenerateProducts();
 
   const handleSelect = async () => {
-    console.log("select pressed", {source_brand: inputResponse.sourceBrand,
+    console.log("select pressed", {
+      source_brand: inputResponse.sourceBrand,
       plastic_type: inputResponse.plasticType,
       location: inputResponse.location,
-      target_brand: brand})
+      target_brand: brand
+    });
+
+    // Notify parent component that loading has started
+    if (onLoadingChange) {
+      onLoadingChange(true);
+    }
+
     try {
       const response = await submit({
         source_brand: inputResponse.sourceBrand,
@@ -55,13 +65,30 @@ const BrandMatchCard: React.FC<BrandMatchCardProps> = ({
       if (onProductsGenerated) {
         onProductsGenerated(response);
       }
-      console.log("sending this data", { response, inputData: inputResponse, combinedReach, estimatedImpact, confidenceScore })
-      navigate("/product-results", { state: { response, inputData: inputResponse, combinedReach, estimatedImpact, confidenceScore } });
-      // You can also navigate or perform other actions here
-      // window.location.href = selectUrl; // if you still want to navigate
+
+      console.log("sending this data", {
+        response,
+        inputData: inputResponse,
+        combinedReach,
+        estimatedImpact,
+        confidenceScore
+      });
+
+      navigate("/product-results", {
+        state: {
+          response,
+          inputData: inputResponse,
+          combinedReach,
+          estimatedImpact,
+          confidenceScore
+        }
+      });
     } catch (err) {
       console.error('Error generating products:', err);
-      // Handle error as needed
+      // Notify parent component that loading has ended (even on error)
+      if (onLoadingChange) {
+        onLoadingChange(false);
+      }
     }
   };
 
@@ -90,7 +117,6 @@ const BrandMatchCard: React.FC<BrandMatchCardProps> = ({
           {logoUrl && (
             <img src={logoUrl} alt={`${brand} logo`} className="h-[100%] w-auto mb-4" />
           )}
-         
         </div>
 
         {/* Brand Name, Bottom Left */}
