@@ -63,8 +63,34 @@ class PostgresManager:
                 recycling_potential TEXT,
                 regional_relevance TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
+                );
             """)
+                cur.execute("""
+            CREATE TABLE IF NOT EXISTS collaborations (
+            id SERIAL PRIMARY KEY,
+            source_brand TEXT NOT NULL,
+            target_brand TEXT NOT NULL,
+            plastic_type TEXT,
+            location TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+            """)
+                
+                cur.execute("""
+            CREATE TABLE IF NOT EXISTS collaboration_products (
+            id SERIAL PRIMARY KEY,
+            collaboration_id INTEGER REFERENCES collaborations(id) ON DELETE CASCADE,
+            product_type TEXT,
+            product_name TEXT,
+            product_description TEXT,
+            pitch TEXT,
+            image_url TEXT,
+            full_result JSONB
+);
+            """)
+                
+
+
         finally:
             conn.close()
 
@@ -154,5 +180,103 @@ class PostgresManager:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 cur.execute("SELECT * FROM plastic_types WHERE plastic_id = %s", (plastic_id,))
                 return cur.fetchone()
+        finally:
+            conn.close()
+    
+    def create_collaboration(self, source_brand, target_brand, plastic_type, location) -> int:
+        conn = self._get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO collaborations (source_brand, target_brand, plastic_type, location)
+                    VALUES (%s, %s, %s, %s)
+                    RETURNING id
+                """, (source_brand.lower(), target_brand.lower(), plastic_type.lower(), location.lower()))
+                collaboration_id = cur.fetchone()[0]
+                conn.commit()
+                return collaboration_id
+        except Exception as e:
+            print(f"Error saving collaboration: {e}")
+            raise
+        finally:
+            conn.close()
+
+    def add_collaboration_product(self, collaboration_id: int, data: Dict) -> int:
+        conn = self._get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO collaboration_products (
+                        collaboration_id, product_name, product_type,
+                        product_description, pitch, image_url, full_result
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                """, (
+                    collaboration_id,
+                    data["product_name"],
+                    data.get("product_type"),
+                    data.get("product_description"),
+                    data.get("pitch"),
+                    data.get("image_url"),
+                    Json(data["full_result"])  # Make sure it's a dict
+                ))
+                product_id = cur.fetchone()[0]
+                conn.commit()
+                return product_id
+        except Exception as e:
+            print(f"Error saving product: {e}")
+            raise
+        finally:
+            conn.close()
+
+    def get_collaboration_with_products(self, source_brand, target_brand, plastic_type, location) -> Optional[Dict]:
+        conn = self._get_connection()
+        print(f"Searching for collaboration with: source_brand='{source_brand}', "
+              f"target_brand='{target_brand}', plastic_type='{plastic_type}', location='{location}'")
+        try:
+            with conn.cursor() as cur:
+                # Search for the collaboration record
+                cur.execute("""
+                    SELECT id FROM collaborations
+    WHERE LOWER(source_brand) = LOWER(%s)
+      AND LOWER(target_brand) = LOWER(%s)
+      AND LOWER(plastic_type) = LOWER(%s)
+      AND LOWER(location) = LOWER(%s)
+    LIMIT 1
+                """, (source_brand, target_brand, plastic_type, location))
+                row = cur.fetchone()
+
+                if not row:
+                    print("No collaboration found for the given criteria.")
+                    return None
+
+                collaboration_id = row[0]
+                print(f"Found collaboration with ID: {collaboration_id}")
+
+                # Fetch associated products
+                cur.execute("""
+                    SELECT product_name, product_type, product_description, pitch, image_url
+                    FROM collaboration_products
+                    WHERE collaboration_id = %s
+                """, (collaboration_id,))
+                products = cur.fetchall()
+
+                print(f"Retrieved {len(products)} products for collaboration ID {collaboration_id}")
+
+                product_keys = ["product_name", "product_type", "product_description", "pitch", "image_url"]
+                product_dicts = [dict(zip(product_keys, p)) for p in products]
+
+                return {
+                    "collaboration_id": collaboration_id,
+                    "source_brand": source_brand,
+                    "target_brand": target_brand,
+                    "plastic_type": plastic_type,
+                    "location": location,
+                    "products": product_dicts
+                }
+
+        except Exception as e:
+            print(f"Error fetching existing collaboration: {e}")
+            return None
         finally:
             conn.close()

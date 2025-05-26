@@ -8,6 +8,7 @@ from app.database.vector_db import VectorDBManager
 from app.database.postgres_db import PostgresManager
 from app.models.schemas import BrandProfile
 from app.models.schemas import PlasticMaterialProfile
+from psycopg2.extras import Json
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -142,3 +143,34 @@ class DataManager:
         except Exception as e:
             logger.error(f"Error adding plastic data: {e}")
             return None
+        
+    def save_collaboration(self, source_brand: str, target_brand: str, plastic_type: str, location: str) -> int:
+        """
+        Create a new collaboration entry in the database.
+        """
+        try:
+            collaboration_id = self.postgres_db.create_collaboration(
+                source_brand=source_brand,
+                target_brand=target_brand,
+                plastic_type=plastic_type,
+                location=location
+            )
+            logger.info(f"Created collaboration with ID: {collaboration_id}")
+            return collaboration_id
+        except Exception as e:
+            logger.error(f"Error saving collaboration: {e}")
+            raise
+
+    def save_collaboration_product(self, collaboration_id: int, product_data: Dict) -> int:
+        """
+        Add a product idea to an existing collaboration in the database.
+        """
+        try:
+            product_id = self.postgres_db.add_collaboration_product(collaboration_id, product_data)
+            logger.info(f"Saved collaboration product with ID: {product_id}")
+            return product_id
+        except Exception as e:
+            logger.error(f"Error saving collaboration product: {e}")
+            raise
+
+  

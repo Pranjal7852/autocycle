@@ -81,7 +81,7 @@ export const LoadingComponent: React.FC<LoadingComponentProps> = ({
 
             {/* Loading Text */}
             <div className="text-center mb-6 max-w-md">
-                <h2 className="text-xl font-semibold text-gray-800 mb-2 transition-opacity duration-500">
+                <h2 className="text-xl font-semibold text-gray-800 mb-2 transition-opacity duration-500 whitespace-nowrap">
                     {loadingTexts[currentTextIndex]}
                 </h2>
               

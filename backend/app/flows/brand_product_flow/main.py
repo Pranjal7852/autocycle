@@ -234,6 +234,17 @@ class BrandProductFlow(Flow[BrandProductState]):
     async def process_product_development_v2(self):
         try:
             product_ideas = self.state.product_ideas["products"]
+            source_brand = self.state.source_brand
+            target_brand = self.state.target_brand
+            plastic_type = self.state.plastic_type
+            location = self.state.location
+            
+            collaboration_id = self.data_manager.save_collaboration(
+                source_brand=self.state.source_brand,
+                target_brand=self.state.target_brand,
+                plastic_type=self.state.plastic_type,
+                location=self.state.location
+            )
             
             # Create coroutines for parallel execution
             coroutines = [
@@ -260,6 +271,14 @@ class BrandProductFlow(Flow[BrandProductState]):
                         "error": str(result)
                     })
                 else:
+                    self.data_manager.save_collaboration_product(collaboration_id, {
+                    "product_name": result["product_name"],
+                    "product_type": result.get("product_type"),
+                    "product_description": result.get("product_description"),
+                    "pitch": result.get("pitch"),
+                    "image_url": result.get("image_url"),
+                    "full_result": result
+                })
                     processed_results.append({
                         "product_name": product_ideas[i]["name"],
                         "status": "success",
