@@ -20,9 +20,9 @@ export const LoadingComponent: React.FC<LoadingComponentProps> = ({
         "Hang tight, we're almost done..."
     ],
     showTimer = false,
-    timerDuration = 30,
+    timerDuration = 60,
     onTimerComplete,
-    textChangeInterval = 2000,
+    textChangeInterval = 3000,
     className = ""
 }) => {
     const [currentTextIndex, setCurrentTextIndex] = useState(0);

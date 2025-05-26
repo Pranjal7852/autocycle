@@ -15,12 +15,12 @@ const FlowNavigator: React.FC<FlowNavigatorProps> = ({ currentStep, brandType })
     },
     {
       label: "Getting Started",
-      link: brandType === "have" ? "/need-material" : "/have-material",
+      link: "/collaborations",
       key: "form",
     },
     {
       label: "Brands",
-      link: brandType === "have" ? "/brandmatch" : "/brandmatch",
+      link: "/brandmatch",
       key: "brand",
     },
     {

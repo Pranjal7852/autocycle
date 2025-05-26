@@ -108,11 +108,11 @@ const HaveMaterial: React.FC = () => {
   const error = brandError || productsError;
 
   if (isSubmitting) {
-    return <LoadingComponent />;
+    return <LoadingComponent/>;
   }
 
   return (
-    <div className="relative max-w-5xl mx-auto bg-background min-h-screen px-4 py-12 sm:py-16">
+    <div className="relative max-w-5xl mx-auto bg-background min-h-screen">
       <FlowNavigator currentStep="form" brandType="have" />
 
       <div className="relative z-10">
@@ -150,9 +150,18 @@ const HaveMaterial: React.FC = () => {
                   <SelectItem value="PP">Polypropylene (PP)</SelectItem>
                   <SelectItem value="PET">Polyethylene Terephthalate (PET)</SelectItem>
                   <SelectItem value="HDPE">High-Density Polyethylene (HDPE)</SelectItem>
-                  <SelectItem value="PVC">Polyvinyl Chloride (PVC)</SelectItem>
                   <SelectItem value="LDPE">Low-Density Polyethylene (LDPE)</SelectItem>
-                  <SelectItem value="PC/ABS">Polycarbonate/Acrylonitrile-Butadiene-Styrene (PC/ABS)</SelectItem>
+                  <SelectItem value="PVC">Polyvinyl Chloride (PVC)</SelectItem>
+                  <SelectItem value="PS">Polystyrene (PS)</SelectItem>
+                  <SelectItem value="PC">Polycarbonate (PC)</SelectItem>
+                  <SelectItem value="ABS">Acrylonitrile Butadiene Styrene (ABS)</SelectItem>
+                  <SelectItem value="PC/ABS">Polycarbonate/ABS Blend (PC/ABS)</SelectItem>
+                  <SelectItem value="PLA">Polylactic Acid (PLA - Bioplastic)</SelectItem>
+                  <SelectItem value="PA">Polyamide (Nylon - PA)</SelectItem>
+                  <SelectItem value="EVA">Ethylene-Vinyl Acetate (EVA)</SelectItem>
+                  <SelectItem value="TPU">Thermoplastic Polyurethane (TPU)</SelectItem>
+                  <SelectItem value="PBT">Polybutylene Terephthalate (PBT)</SelectItem>
+                  <SelectItem value="PMMA">Polymethyl Methacrylate (PMMA - Acrylic)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

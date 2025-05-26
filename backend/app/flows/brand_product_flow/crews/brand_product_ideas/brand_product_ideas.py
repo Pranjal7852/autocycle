@@ -64,7 +64,7 @@ class BrandProductIdeasCrew:
         logger.logger.info("Creating task to generate product concepts with creative briefs")
         return Task(
             description="""
-            Using the provided database information for '{source_brand_data}', '{target_brand_data}', and '{plastic_data}', generate 2 collaborative product ideas.
+            Using the provided database information for '{source_brand_data}', '{target_brand_data}', and '{plastic_data}', generate 5 collaborative product ideas.
             For each product, provide:
             - **Product Type**: The category or type of product (e.g., accessory, wearable, furniture)
             - **Name**: Clear, brandable product name (5-6 words)
@@ -98,7 +98,7 @@ class BrandProductIdeasCrew:
                 ]
             }
 
-            Generate exactly 2 products that represent the best collaboration opportunities.""",
+            Generate exactly 5 products that represent the best collaboration opportunities.""",
             agent=self.product_conceptualizer(),
             expected_output="""Return a JSON object with this structure:
 
@@ -117,7 +117,7 @@ class BrandProductIdeasCrew:
               ]
             }
 
-            Provide exactly 2 well-considered product concepts.""",
+            Provide exactly 5 well-considered product concepts.""",
             output_pydantic=ProductIdeasOutput
         )
 

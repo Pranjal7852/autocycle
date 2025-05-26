@@ -73,7 +73,7 @@ class BrandProductDevelopers:
             this is the discription about the product - {product_description}
 
             Include:
-            - A detailed concept (25-30 words)
+            - A detailed concept (10-20 words)
             - How it leverages each brand's identity
             - Market positioning and intended audience
             - Sustainability innovation

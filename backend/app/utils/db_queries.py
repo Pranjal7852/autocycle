@@ -149,7 +149,7 @@ class DataManager:
         Create a new collaboration entry in the database.
         """
         try:
-            collaboration_id = self.postgres_db.create_collaboration(
+            collaboration_id = self.postgres_db.create_or_get_collaboration(
                 source_brand=source_brand,
                 target_brand=target_brand,
                 plastic_type=plastic_type,

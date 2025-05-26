@@ -183,23 +183,42 @@ class PostgresManager:
         finally:
             conn.close()
     
-    def create_collaboration(self, source_brand, target_brand, plastic_type, location) -> int:
+    def create_or_get_collaboration(self, source_brand, target_brand, plastic_type, location) -> int:
         conn = self._get_connection()
+        source_brand = source_brand.lower()
+        target_brand = target_brand.lower()
+        plastic_type = plastic_type.lower()
+        location = location.lower()
+
         try:
             with conn.cursor() as cur:
+                # Try to find existing collaboration
                 cur.execute("""
-                    INSERT INTO collaborations (source_brand, target_brand, plastic_type, location)
-                    VALUES (%s, %s, %s, %s)
-                    RETURNING id
-                """, (source_brand.lower(), target_brand.lower(), plastic_type.lower(), location.lower()))
-                collaboration_id = cur.fetchone()[0]
-                conn.commit()
-                return collaboration_id
+                    SELECT id FROM collaborations
+                    WHERE source_brand = %s AND target_brand = %s
+                      AND plastic_type = %s AND location = %s
+                    LIMIT 1
+                """, (source_brand, target_brand, plastic_type, location))
+                row = cur.fetchone()
+
+                if row:
+                    return row[0]  # Collaboration exists
+                else:
+                    # Insert new collaboration
+                    cur.execute("""
+                        INSERT INTO collaborations (source_brand, target_brand, plastic_type, location)
+                        VALUES (%s, %s, %s, %s)
+                        RETURNING id
+                    """, (source_brand, target_brand, plastic_type, location))
+                    new_id = cur.fetchone()[0]
+                    conn.commit()
+                    return new_id
         except Exception as e:
-            print(f"Error saving collaboration: {e}")
+            print(f"Error creating/finding collaboration: {e}")
             raise
         finally:
             conn.close()
+
 
     def add_collaboration_product(self, collaboration_id: int, data: Dict) -> int:
         conn = self._get_connection()
@@ -278,5 +297,36 @@ class PostgresManager:
         except Exception as e:
             print(f"Error fetching existing collaboration: {e}")
             return None
+        finally:
+            conn.close()
+            
+    def get_collaboration_product_count(self, collaboration_id: int) -> int:
+        conn = self._get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT COUNT(*) FROM collaboration_products
+                    WHERE collaboration_id = %s
+                """, (collaboration_id,))
+                count = cur.fetchone()[0]
+                return count
+        except Exception as e:
+            print(f"Error counting products: {e}")
+            return 0
+        finally:
+            conn.close()
+
+    def delete_products_for_collaboration(self, collaboration_id: int):
+        conn = self._get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    DELETE FROM collaboration_products
+                    WHERE collaboration_id = %s
+                """, (collaboration_id,))
+                conn.commit()
+        except Exception as e:
+            print(f"Error deleting products: {e}")
+            raise
         finally:
             conn.close()

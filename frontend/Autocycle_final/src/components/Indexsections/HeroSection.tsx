@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 
 const HeroSection: React.FC = () => {
   return (
-    <div className="w-full bg-white flex py-4 border-2 border-red-200 justify-center">
+    <div className="w-full bg-white flex py-4  justify-center">
       <div className="flex flex-col md:flex-row w-full justify-center">
         {/* LEFT COLUMN */}
-        <div className="flex flex-col w-[65%] z-10 border-2 border-red-200">
+        <div className="flex flex-col w-[65%] z-10 ">
           <h1 className="font-plex text-black text-[104px] leading-none uppercase font-bold relative">
-            UPYLCE<br />YOUR BRAND
+            UPCYLCE<br />YOUR BRAND
           </h1>
           <div className="relative w-[100%] flex-shrink-0 h-[800px]">
           {/* Light blue square background */}
@@ -52,7 +52,7 @@ const HeroSection: React.FC = () => {
       </div>
 
         {/* RIGHT COLUMN */}
-        <div className="flex flex-col w-[35%] items-center mt-[100px]  border-2 border-red-200">
+        <div className="flex flex-col w-[35%] items-center mt-[100px]  ">
         {/* Samsonite x Bosch */} 
           <div className="w-full flex justify-end items-center z-10">
             {/* Grey square background */}
