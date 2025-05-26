@@ -27,10 +27,8 @@ const App = () => (
             <Route path="/collaborations" element={<Collaborations />} />
             <Route path="/have-material" element={<HaveMaterial />} />
             <Route path="/need-material" element={<NeedMaterial />} />
-            <Route path="/hm_brandmatch" element={<HaveMaterialBrandMatch />} />
-            <Route path="/nm_brandmatch" element={<NeedMaterialBrandMatch />} />
-            <Route path="/have-material/:brand-collaboration" element={<ProductResults />} />
-            <Route path="/need-material/:brand-collaboration" element={<ProductResults />} />
+            <Route path="/brandmatch" element={<HaveMaterialBrandMatch />} />
+            <Route path="/product-results" element={<ProductResults />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </ResponsiveWrapper>

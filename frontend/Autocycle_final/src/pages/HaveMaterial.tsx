@@ -5,10 +5,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import FlowNavigator from "@/components/FlowNavigator";
 import { useGenerateBrand } from "@/hooks/useGenerateBrand";
+import { LoadingComponent } from "@/components/Loading";
 
 const HaveMaterial: React.FC = () => {
   const navigate = useNavigate();
   const { isLoading, error, submit } = useGenerateBrand();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     brand: "",
     plastic_type: "PP",
@@ -38,24 +40,35 @@ const HaveMaterial: React.FC = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true); // Show loading screen
+
     try {
       const response = await submit({
         brand: formData.brand,
         plastic_type: formData.plastic_type,
         location: formData.location,
       });
-      navigate("/hm_brandmatch", {
+
+      navigate("/brandmatch", {
         state: {
           formData,
           apiResponse: response,
-          inputResponse: { "sourceBrand": formData.brand, "location": formData.location, "plasticType": formData.plastic_type},
-
+          inputResponse: {
+            sourceBrand: formData.brand,
+            location: formData.location,
+            plasticType: formData.plastic_type,
+          },
         },
       });
     } catch (err) {
-      // Error handled by the hook
+      // Handled in hook
+      setIsSubmitting(false);
     }
   };
+
+  if (isSubmitting) {
+    return <LoadingComponent />;
+  }
 
   return (
     <div className="relative max-w-5xl mx-auto bg-background min-h-screen px-4 py-12 sm:py-16">
@@ -66,9 +79,7 @@ const HaveMaterial: React.FC = () => {
           Find the material that brings your product to life
         </h1>
 
-        {error && (
-          <div className="text-red-500 text-center mb-4 font-sans">{error}</div>
-        )}
+        {error && <div className="text-red-500 text-center mb-4 font-sans">{error}</div>}
 
         <form onSubmit={handleSubmit} className="max-w-2xl mx-auto space-y-10">
           <div>
@@ -143,8 +154,8 @@ const HaveMaterial: React.FC = () => {
               disabled={isLoading}
               className="mt-4 py-3 px-12 bg-primary border border-primary text-primary-foreground font-poppins text-xl rounded-lg hover:bg-primary/90 transition"
             >
-              {isLoading ? "Submitting..." : "Get inspired"}
-              {!isLoading && <img src="/icons/arrow_outward.svg" alt="Arrow icon" className="w-18 h-18" />}
+              Get inspired
+              <img src="/icons/arrow_outward.svg" alt="Arrow icon" className="ml-2 w-5 h-5" />
             </Button>
           </div>
         </form>

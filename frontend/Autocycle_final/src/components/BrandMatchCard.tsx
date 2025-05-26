@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useGenerateProducts } from "@/hooks/useGenerateProducts";
+import { useNavigate } from "react-router-dom";
 
 interface BrandMatchCardProps {
   brand: string;
@@ -35,9 +36,14 @@ const BrandMatchCard: React.FC<BrandMatchCardProps> = ({
   inputResponse,
   onProductsGenerated,
 }) => {
+  const navigate = useNavigate();
   const { isLoading, error, submit } = useGenerateProducts();
 
   const handleSelect = async () => {
+    console.log("select pressed", {source_brand: inputResponse.sourceBrand,
+      plastic_type: inputResponse.plasticType,
+      location: inputResponse.location,
+      target_brand: brand})
     try {
       const response = await submit({
         source_brand: inputResponse.sourceBrand,
@@ -49,7 +55,8 @@ const BrandMatchCard: React.FC<BrandMatchCardProps> = ({
       if (onProductsGenerated) {
         onProductsGenerated(response);
       }
-
+      console.log("sending this data", { response, inputData: inputResponse, combinedReach, estimatedImpact, confidenceScore })
+      navigate("/product-results", { state: { response, inputData: inputResponse, combinedReach, estimatedImpact, confidenceScore } });
       // You can also navigate or perform other actions here
       // window.location.href = selectUrl; // if you still want to navigate
     } catch (err) {

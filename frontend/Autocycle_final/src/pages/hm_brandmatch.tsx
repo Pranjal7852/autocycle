@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useLocation } from "react-router-dom";
 import BrandMatchCard from "@/components/BrandMatchCard";
 import FlowNavigator from "@/components/FlowNavigator";
@@ -33,36 +33,17 @@ interface GenerateBrandResponse {
 
 interface FormData {
   materialType: string;
-  // Add other form fields as needed
+  brand: string;
+  location: string;
 }
 
 const BrandMatch: React.FC = () => {
   const { state } = useLocation();
-  const { formData, apiResponse } = state || {} as { formData: FormData; apiResponse: GenerateBrandResponse };
-  const [isLoading, setIsLoading] = useState(true);
+  const { formData, apiResponse, inputResponse } = state || {} as { formData: FormData; apiResponse: GenerateBrandResponse };
+  console.log("data eceived", inputResponse)
+  const collaborations = apiResponse?.result?.results?.top_collaborations || [];
 
-  // Simulate loading delay
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000); // 1-second delay
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Loading screen
-  if (isLoading) {
-    return (
-      <div className="bg-background min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-primary mx-auto"></div>
-          <p className="font-mulish text-lg text-primary mt-4">Loading brand matches...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Fallback if no data
-  if (!formData || !apiResponse || apiResponse.status !== "success" || !apiResponse.result?.results?.top_collaborations) {
+  if (!formData || !apiResponse || apiResponse.status !== "success") {
     return (
       <div className="bg-background min-h-screen">
         <div className="max-w-5xl mx-auto px-4 sm:px-8 py-12">
@@ -78,8 +59,7 @@ const BrandMatch: React.FC = () => {
     );
   }
 
-  // Map API data to BrandMatchCard props
-  const cardsData = apiResponse.result.results.top_collaborations.map((collab) => ({
+  const cardsData = collaborations.map((collab) => ({
     brand: collab.brand_name,
     selectUrl: `/have-material/${collab.brand_name.toLowerCase().replace(/\s/g, "-")}`,
     brandPlacement: collab.brand_placement.join(", "),
@@ -99,28 +79,22 @@ const BrandMatch: React.FC = () => {
         <h1 className="font-mulish text-2xl sm:text-3xl font-extrabold uppercase text-center text-primary mb-14">
           All set. Your results are ready to explore
         </h1>
-        <div className="flex flex-col gap-10">
-          {cardsData.map((card, idx) => (
-            <BrandMatchCard
-              key={card.brand + idx}
-              brand={card.brand}
-              selectUrl={card.selectUrl}
-              brandPlacement={card.brandPlacement}
-              sustainabilityPlacement={card.sustainabilityPlacement}
-              productAssumptions={card.productAssumptions}
-              estimatedImpact={card.estimatedImpact}
-              combinedReach={card.combinedReach}
-              confidenceScore={card.confidenceScore}
-              logoUrl={card.logoUrl}
-              companyDomain={card.companyDomain}
-              inputResponse={{
-                sourceBrand: formData.brand || "",
-                location: formData.location || "",
-                plasticType: formData.materialType || "",
-              }}
-            />
-          ))}
-        </div>
+
+        {cardsData.length === 0 ? (
+          <p className="text-center text-gray-500 font-mulish">
+            No brand matches found for the selected criteria.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-10">
+            {cardsData.map((card, idx) => (
+              <BrandMatchCard
+                key={card.brand + idx}
+                {...card}
+                inputResponse={inputResponse}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

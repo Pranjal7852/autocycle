@@ -82,6 +82,7 @@ export const useGenerateProducts = (): GenerateProductsHookResponse => {
                 }, 1000);
             });
 
+
             console.log("Returning dummy response", response);
             return response;
         } catch (err) {
