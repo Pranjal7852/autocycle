@@ -24,6 +24,7 @@ class BrandResearchState(BaseModel):
     brand_name: str = ""
     plastic_type: str = ""
     location: str = ""
+    need_plastic: bool = True
     brand_results: dict = {}
     plastic_results: dict = {}
     collab_results: dict = {}
@@ -186,7 +187,9 @@ class ResearchFlow(Flow[BrandResearchState]):
         try:
             input_data = {
                 "brand_data": self.state.brand_results,
-                "plastic_data": self.state.plastic_results
+                "plastic_data": self.state.plastic_results,
+                "location": self.state.location,
+                "need_plastic": self.state.need_plastic
             }
             combined_results = await self.collab_crew.kickoff(input_data=input_data)
             self.state.combined_results = combined_results
@@ -196,12 +199,13 @@ class ResearchFlow(Flow[BrandResearchState]):
             return {"status": "collaboration_failed", "error": str(e)}
 
 
-async def brand_research_kickoff(brand_name: str = "", plastic_type: str = "", location: str = ""):
+async def brand_research_kickoff(brand_name: str = "", plastic_type: str = "", location: str = "", need_plastic: bool = True):
     data_manager = DataManager()
     flow = ResearchFlow(data_manager)
     flow.state.brand_name = brand_name
     flow.state.plastic_type = plastic_type
     flow.state.location = location
+    flow.state.need_plastic = need_plastic
     flow.plot("ResearchFlowPlot")
     logger.logger.info(flow.state)
     return await flow.kickoff_async()

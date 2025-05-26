@@ -5,6 +5,7 @@ interface GenerateBrandData {
     brand: string;
     plastic_type: string;
     location: string;
+    need_plastic: boolean;
 }
 
 interface CollaborationBrand {
@@ -63,6 +64,7 @@ export const useGenerateBrand = (): GenerateBrandHookResponse => {
                 brand: data.brand || "",
                 plastic_type: data.plastic_type,
                 location: data.location,
+                need_plastic: data.need_plastic
             });
 
             console.log("Received response from /generatebrand:", response.data);

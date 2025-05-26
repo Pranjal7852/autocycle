@@ -22,6 +22,7 @@ class GenerateBrandRequest(BaseModel):
     brand: str
     plastic_type: str
     location: str
+    need_plastic: bool
 
 class GenerateProductsRequest(BaseModel):
     source_brand: str
@@ -44,7 +45,8 @@ async def analyze_plastic_reuse(request: GenerateBrandRequest):
         result = await brand_research_kickoff(
             brand_name=request.brand,
             plastic_type=request.plastic_type,
-            location=request.location
+            location=request.location,
+            need_plastic=request.need_plastic
         )
         
         return {

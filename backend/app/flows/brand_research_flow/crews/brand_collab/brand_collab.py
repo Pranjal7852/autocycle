@@ -94,8 +94,22 @@ You evaluate:
     @task
     def identify_collaboration_opportunities(self) -> Task:
         return Task(
-            description="""Analyze the provided brand data '{brand_data}' and plastic material data '{plastic_data}' 
-to generate up to 5 innovative cross-industry physical product collaboration recommendations.
+            description="""Analyze the provided brand data '{brand_data}', plastic material data '{plastic_data}', location {location}'
+and the plastic collaboration direction flag `need_plastic = {need_plastic}`.
+
+Based on the need_plastic flag, apply the following logic:
+
+If need_plastic is True:
+- The brand **needs** sustainable plastic to integrate into their product line.
+- Recommend collaborators that can **supply**, **upcycle**, or **integrate** their own plastic waste/materials.
+- Ensure the plastic is a **core feature** of the proposed product concepts.
+
+If need_plastic is False:
+- The brand **provides** sustainable plastic materials (e.g. recycled, upcycled, biodegradable).
+- Recommend collaborators that can **utilize** this plastic in their product line meaningfully.
+- Ensure that the plastic is **strategically integrated** into the product concept.
+
+Generate up to 5 innovative cross-industry physical product collaboration recommendations.
 
 For each recommendation, provide:
 - brand_name: The collaborating brand name

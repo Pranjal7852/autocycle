@@ -17,6 +17,8 @@ def generate_image_via_openai(prompt: str, product_name: str) -> str:
             n=1,
             size="1024x1024",
             quality="high",
+            background="transparent"
+
         )
         image_base64 = response.data[0].b64_json
         image_bytes = base64.b64decode(image_base64)

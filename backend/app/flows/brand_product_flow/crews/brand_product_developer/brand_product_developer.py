@@ -68,7 +68,7 @@ class BrandProductDevelopers:
             pitch_agent = self.pitch_writer(brand, target_brand, product_name, product_type)
 
             pitch_prompt = f"""
-            Generate a pitch for an upcycled {product_type} called "{product_name}", a collaboration between {brand} and {target_brand}.
+            Generate a pitch for an upcycled {product_type}, a collaboration between {brand} and {target_brand}.
             
             this is the discription about the product - {product_description}
 

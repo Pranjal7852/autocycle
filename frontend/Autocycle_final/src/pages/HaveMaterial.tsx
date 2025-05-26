@@ -83,6 +83,7 @@ const HaveMaterial: React.FC = () => {
           brand: formData.brand,
           plastic_type: formData.plastic_type,
           location: formData.location,
+          need_plastic: false
         });
 
         navigate("/brandmatch", {

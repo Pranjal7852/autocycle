@@ -43,62 +43,73 @@ class BrandProductIdeasCrew:
     def product_conceptualizer(self) -> Agent:
         logger.logger.info("Creating product conceptualizer agent")
         return Agent(
-            role="Brand Collaboration Product Strategist",
-            goal="Generate viable collaborative product concepts and provide clear briefs for creative pitch and image generation teams.",
-            backstory="""You are a strategic product developer who specializes in brand collaborations. 
-            Your job is to identify realistic product opportunities that make sense for both brands and 
-            then provide clear, actionable briefs for the creative teams who will pitch and visualize these concepts.
-            
-            You think practically about what products could actually be manufactured using the given materials 
-            while staying true to both brand identities. You write concise, inspiring briefs that give 
-            creative teams everything they need to develop compelling pitches and visuals.
-            
-            You focus on products that feel natural and exciting, not forced partnerships.""",
-           
-            verbose=True,
-            allow_delegation=False
-        )
+    role="AI-Driven Brand Synergy Strategist",
+    goal="Identify compelling, manufacturable product ideas for cross-brand collaborations and translate them into detailed, visual-friendly prompts for AI content generation teams.",
+    backstory="""You are a hybrid strategist and creative technologist specializing in brand collaborations. 
+    Your mission is to spot realistic and visually striking opportunities where two brands can meet—whether 
+    through form, function, material use, or shared values.
+
+    You prioritize products that can be realistically prototyped or produced, ensuring they align with 
+    both brands' manufacturing strengths and aesthetic codes. You excel in translating abstract brand traits 
+    into concrete product visions that feel innovative yet natural.
+
+    Your deliverables include succinct briefs and AI-ready image prompts written for generative models.
+    These briefs guide visual creators with exact product type suggestions, form factor hints, 
+    material cues, and color palettes rooted in commercial aesthetics.
+
+    You avoid cliché mashups and instead look for clever, grounded intersections between the two brands. 
+    Every idea should feel like a premium concept ready for the pitch room or the next design sprint.""",
+    
+    verbose=True,
+    allow_delegation=True
+)
 
     @task
     def generate_product_concepts(self) -> Task:
         logger.logger.info("Creating task to generate product concepts with creative briefs")
         return Task(
             description="""
-            Using the provided database information for '{source_brand_data}', '{target_brand_data}', and '{plastic_data}', generate 5 collaborative product ideas.
-            For each product, provide:
-            - **Product Type**: The category or type of product (e.g., accessory, wearable, furniture)
-            - **Name**: Clear, brandable product name (5-6 words)
-            - **Description**: Concise product overview (30-40 words)
+You are generating **strategic and visually-inspiring product concepts** for a collaboration between two brands, centered around a sustainable plastic material.
 
-            Focus on products that:
-            - Take an iconic item from one brand and reimagine it with the other's aesthetic
-            - Use the plastic material meaningfully in the design
-            - Could realistically be manufactured
-            - Represent clear brand DNA fusion
+---
 
-            For visual descriptions, think about:
-            - Which brand contributes the base product form
-            - Which brand contributes the design aesthetic/technology
-            - How the plastic material influences the look and feel
-            - Suggested color palette that blends both brand identities
+🔎 **Context:**
+- **Source Brand**: `{source_brand_data}`
+  - This brand contributes its **signature plastic material** and associated identity (e.g., color, texture, sustainability ethos).
+- **Target Brand**: `{target_brand_data}`
+  - This brand provides the **product category** and **consumer-facing platform** for the final item.
+- **Plastic Material Data**: `{plastic_data}`
 
-            Output format:
-            {
-                "input_summary": {
-                    "brand_1": "string",
-                    "brand_2": "string",
-                    "plastic_material": "string"
-                },
-                "products": [
-                    {
-                        "product_type": "string",
-                        "name": "string",
-                        "description": "string (30-40 words)"
-                    }
-                ]
-            }
+---
 
-            Generate exactly 5 products that represent the best collaboration opportunities.""",
+🎯 **Your Task:**
+Generate **1 high-potential collaborative product concepts** that could be realistically manufactured and visually promoted.
+
+For each concept, provide:
+- **Product Type**: Clear product category (e.g., utility tool, desk item, wearable)
+- **Concept Name**: A short, brandable name (4–6 words max)
+- **Description**: 40–50 words explaining:
+  - What the product is
+  - How it fuses both brands (form, story, or material)
+  - How the plastic material transforms the function, texture, or aesthetics
+
+---
+
+📌 **Creative & Strategic Constraints:**
+- The product **must align with the target brand's market and audience** — adjacent categories are fine if believable.
+- The plastic material is **not decorative** — it should meaningfully shape the product (e.g., modularity, tactility, sustainability messaging).
+- Emphasize **brand fusion**: combine the **visual/form language** of the target with the **material/innovation ethos** of the source.
+- Favor concepts with **strong storytelling or visual distinctiveness** — think of something that could inspire a compelling AI-generated image or pitch deck.
+
+---
+
+🖼️ **Visual/Prompt Guidance** (for downstream AI image generation):
+- **Product form** → derives from target brand
+- **Material/texture innovation** → derives from source brand
+- Think: "How would this look in a premium ad visual?"
+
+Return exactly **1 strong, differentiated idea**.
+        """,
             agent=self.product_conceptualizer(),
             expected_output="""Return a JSON object with this structure:
 
@@ -117,7 +128,7 @@ class BrandProductIdeasCrew:
               ]
             }
 
-            Provide exactly 5 well-considered product concepts.""",
+            Provide exactly 1 well-considered product concepts.""",
             output_pydantic=ProductIdeasOutput
         )
 

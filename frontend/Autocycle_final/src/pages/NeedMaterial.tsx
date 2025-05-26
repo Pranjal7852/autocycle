@@ -51,10 +51,10 @@ const NeedMaterial: React.FC = () => {
       if (hasCollaborationCompany) {
         // Use the products hook for collaboration and redirect to product results
         const response = await submitProducts({
-          source_brand: formData.brand,
+          source_brand: formData.collaborationCompany,
           plastic_type: formData.plastic_type,
           location: formData.location,
-          target_brand: formData.collaborationCompany,
+          target_brand: formData.brand,
         });
 
         // Hard-coded values for now
@@ -83,6 +83,7 @@ const NeedMaterial: React.FC = () => {
           brand: formData.brand,
           plastic_type: formData.plastic_type,
           location: formData.location,
+          need_plastic: true
         });
 
         navigate("/brandmatch", {
