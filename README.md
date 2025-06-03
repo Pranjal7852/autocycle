@@ -198,34 +198,20 @@ Each crew is designed with specific roles and responsibilities:
    OPENAI_API_KEY=your_api_key
    ```
 
-4. **Start Weaviate**:
+4. **Start Postgress**:
    ```bash
-   docker run -d \
-     -p 8080:8080 \
-     -e QUERY_DEFAULTS_LIMIT=25 \
-     -e AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED=true \
-     -e PERSISTENCE_DATA_PATH="/var/lib/weaviate" \
-     -e DEFAULT_VECTORIZER_MODULE="text2vec-transformers" \
-     -e ENABLE_MODULES="text2vec-transformers" \
-     -e TRANSFORMERS_INFERENCE_API="http://t2v-transformers:8080" \
-     -e CLUSTER_HOSTNAME="node1" \
-     semitechnologies/weaviate:1.24.1
+   docker compose up -d
    ```
 
 ### API Structure
 
 #### Main Endpoints:
 1. **Brand Analysis**:
-   - `/api/brand/analyze`: Analyze brand data
-   - `/api/brand/research`: Research brand information
+   - `/generateBrand`: Analyze brand data and plastic data to give 5 real potential brand for Brand Collaboration.  
 
 2. **Product Ideas**:
-   - `/api/product/generate`: Generate product ideas
-   - `/api/product/analyze`: Analyze product concepts
+   - `/generateproducts`: Generate product ideas for provided brands and plastic type. Given visual images and pitch text.
 
-3. **Plastic Analysis**:
-   - `/api/plastic/analyze`: Analyze plastic materials
-   - `/api/plastic/recommend`: Get material recommendations
 
 ### AI Integration
 
