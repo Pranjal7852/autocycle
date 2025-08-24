@@ -1,4 +1,4 @@
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List, Dict
@@ -7,6 +7,7 @@ from app.utils.crew_logger import CrewLogger
 from app.models.schemas import BrandProfile
 import os
 import logging
+from app.utils.llm_config import llm_config
 
 # Create logs directory if it doesn't exist
 log_dir = os.path.join(os.path.dirname(__file__), 'logs')
@@ -18,7 +19,6 @@ logger = CrewLogger(
     log_level=logging.DEBUG,
     console_output=True
 )
-
 @CrewBase
 class BrandAnalystCrew:
     """Crew for analyzing brand details and sustainability collaborations."""
@@ -36,7 +36,8 @@ class BrandAnalystCrew:
                 backstory="""You specialize in researching and summarizing brand identities for semantic comparison. Your research helps match brands with similar products, values, materials, and markets.""",
                 tools=[SerperDevTool()],
                 verbose=True,
-                allow_delegation=False
+                allow_delegation=False,
+                llm=llm_config()
             )
         except Exception as e:
             logger.logger.error(f"Error creating Brand Researcher agent: {str(e)}")

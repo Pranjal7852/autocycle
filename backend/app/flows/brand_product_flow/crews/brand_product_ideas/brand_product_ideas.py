@@ -6,7 +6,7 @@ from typing import List, Dict
 import os
 import logging
 from app.utils.crew_logger import CrewLogger
-
+from app.utils.llm_config import llm_config
 # Logging setup
 log_dir = os.path.join(os.path.dirname(__file__), 'logs')
 os.makedirs(log_dir, exist_ok=True)
@@ -61,7 +61,8 @@ class BrandProductIdeasCrew:
     Every idea should feel like a premium concept ready for the pitch room or the next design sprint.""",
     
     verbose=True,
-    allow_delegation=True
+    allow_delegation=True,
+    llm=llm_config()
 )
 
     @task

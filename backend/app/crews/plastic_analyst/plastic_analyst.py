@@ -7,6 +7,7 @@ from app.utils.crew_logger import CrewLogger
 import os
 import logging
 from app.models.schemas import PlasticMaterialProfile
+from app.utils.llm_config import llm_config
 
 # Create logs directory if it doesn't exist
 log_dir = os.path.join(os.path.dirname(__file__), 'logs')
@@ -18,8 +19,6 @@ logger = CrewLogger(
     log_level=logging.DEBUG,
     console_output=True
 )
-
-
 @CrewBase
 class PlasticAnalystCrew:
     """Crew for analyzing plastic materials and their properties."""
@@ -40,7 +39,8 @@ class PlasticAnalystCrew:
                 ),
                 tools=[SerperDevTool()],
                 verbose=True,
-                allow_delegation=False
+                allow_delegation=False,
+                llm=llm_config()
             )
         except Exception as e:
             logger.logger.error(f"Error creating plastic analyst agent: {str(e)}")

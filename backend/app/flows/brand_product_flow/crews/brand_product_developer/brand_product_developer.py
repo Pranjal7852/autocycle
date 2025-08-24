@@ -8,8 +8,8 @@ from crewai.project import CrewBase, agent, crew
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from app.utils.crew_logger import CrewLogger
 from crewai_tools import SerperDevTool
-from app.flows.brand_product_flow.crews.brand_product_developer.tools.image_generator import generate_image_via_openai
-
+from app.flows.brand_product_flow.crews.brand_product_developer.tools.image_generator import ai_generate_image
+from app.utils.llm_config import llm_config
 # Setup logging
 log_dir = os.path.join(os.path.dirname(__file__), 'logs')
 os.makedirs(log_dir, exist_ok=True)
@@ -43,7 +43,8 @@ class BrandProductDevelopers:
             - Developing sustainable and innovative product concepts
             - Creating marketing pitches that align with brand values
             - Envisioning co-branded opportunities between {brand} and {target_brand}""",
-            verbose=True
+            verbose=True,
+            llm=llm_config()
         )
 
     @crew
@@ -110,7 +111,7 @@ class BrandProductDevelopers:
 
             # Run image generation concurrently
             image_task = asyncio.to_thread(
-                generate_image_via_openai,
+                ai_generate_image,
                 prompt=image_prompt,
                 product_name=product_name
             )

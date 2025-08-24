@@ -12,6 +12,7 @@ import os
 import aiohttp
 import asyncio
 import requests
+from app.utils.llm_config import llm_config
 
 # Create logs directory if it doesn't exist
 log_dir = os.path.join(os.path.dirname(__file__), 'logs')
@@ -23,7 +24,6 @@ logger = CrewLogger(
     log_level=logging.DEBUG,
     console_output=True
 )
-
 class CollaborationRecommendation(BaseModel):
     brand_name: str = Field(description="Name of the collaborating brand")
     brand_placement: List[str] = Field(description="Key brand positioning attributes")
@@ -68,7 +68,8 @@ You think like an industrial designer who deeply understands brand equity, mater
 Your recommendations are always grounded in physical, manufacturable products that tell a compelling sustainability story.""",
             tools=[SerperDevTool()],
             verbose=False,
-            allow_delegation=False
+            allow_delegation=False,
+            llm=llm_config()
         )
     
     @agent  
@@ -88,7 +89,8 @@ You evaluate:
 - Brand alignment and potential market conflicts""",
             tools=[SerperDevTool()],
             verbose=False,
-            allow_delegation=False
+            allow_delegation=False,
+            llm=llm_config()
         )
 
     @task
