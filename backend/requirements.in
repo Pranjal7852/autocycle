@@ -8,6 +8,7 @@ appdirs
 asgiref
 asttokens
 attrs
+azure-storage-blob
 auth0-python
 Authlib
 backoff
