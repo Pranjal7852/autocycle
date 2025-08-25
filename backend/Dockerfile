@@ -11,9 +11,9 @@ COPY environment.yml .
 RUN conda env create -f environment.yml && \
     conda clean --all --yes
 
-# Activate the Conda environment by default
-# Modify the shell to source Conda
-SHELL ["/bin/bash", "--login", "-c"]
+# Ensure the env name matches your environment.yml
+ARG ENV_NAME=dps-ai-pipeline
+ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
 
 # Copy application code
 COPY . .
@@ -22,15 +22,15 @@ COPY . .
 RUN useradd -m appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Create logs directory with correct permissions
-RUN mkdir -p /app/logs && chown -R appuser:appuser /app/logs
+# Create logs directory
+RUN mkdir -p /app/logs
 
-# Expose port (based on your original Dockerfile)
+# Expose FastAPI port
 EXPOSE 8000
 
-# Set environment variables for Python
+# Set Python environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Run the application using Conda environment
-CMD ["conda", "run", "--no-capture-output", "-n", "myenv", "python", "run.py"]
+# Start app with uvicorn (recommended for FastAPI)
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
