@@ -15,5 +15,18 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  backend:
+    image: bmw-backend-conda
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=postgres  # Use service name for internal networking
+      - POSTGRES_PORT=5432      # Internal port within Docker network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
 volumes:
   postgres_data:

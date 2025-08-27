@@ -4,8 +4,9 @@ FROM continuumio/miniconda3
 # Set working directory
 WORKDIR /app
 
-# Copy environment.yml to define dependencies
+# Copy environment.yml and requirements.txt to define dependencies
 COPY environment.yml .
+COPY requirements.txt .
 
 # Create Conda environment from environment.yml
 RUN conda env create -f environment.yml && \
