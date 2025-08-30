@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios, { AxiosError } from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://0.0.0.0:8000";
+
 interface GenerateBrandData {
     brand: string;
     plastic_type: string;
@@ -34,6 +36,7 @@ interface GenerateBrandResponse {
         };
     };
     message?: string;
+    detail?: string;
 }
 
 interface GenerateBrandHookResponse {
@@ -60,7 +63,7 @@ export const useGenerateBrand = (): GenerateBrandHookResponse => {
 
             console.log("Sending payload to /generatebrand:", data);
 
-            const response = await axios.post<GenerateBrandResponse>("http://0.0.0.0:8000/generatebrand", {
+            const response = await axios.post<GenerateBrandResponse>(`${API_BASE_URL}/generatebrand`, {
                 brand: data.brand || "",
                 plastic_type: data.plastic_type,
                 location: data.location,
