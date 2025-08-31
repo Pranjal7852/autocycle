@@ -13,7 +13,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # Allow your frontend origin
+    allow_origins=["http://localhost:8080","https://demo.autocycle.dev","http://demo.autocycle.dev"],  # Allow your frontend origin
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],  # Allow POST and OPTIONS for preflight
     allow_headers=["Content-Type"],  # Allow Content-Type header
