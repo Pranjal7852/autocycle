@@ -13,7 +13,40 @@ image_provider = os.getenv("AI_IMAGE_PROVIDER")
 
 def ai_generate_image(prompt: str, product_name: str) -> str:
     try:
-        if image_provider == "AZURE":
+        if image_provider == "GPT":
+            # Use Azure OpenAI endpoint with POST request
+            azure_endpoint = os.getenv("GPT_IMAGE_URL")
+            
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {os.getenv('GPT_IMAGE_API_KEY')}"
+            }
+            
+            payload = {
+                "prompt": prompt,
+                "size": "1024x1024",
+                "n": 1,
+                "quality" : "high",
+                "output_compression" : 100,
+                "output_format" : "png",
+            }
+            
+            response = requests.post(
+                f"{azure_endpoint}",
+                headers=headers,
+                json=payload
+            )
+            
+            if response.status_code != 200:
+                raise Exception(f"GPT OpenAI API request failed with status {response.status_code}: {response.text}")
+            
+            response_data = response.json()
+      
+            image_base64 = response_data['data'][0]['b64_json']
+            image_bytes = base64.b64decode(image_base64)
+           
+        
+        elif image_provider == "AZURE":
             # Use Azure OpenAI endpoint with POST request
             azure_endpoint = os.getenv("IMAGE_API_BASE")
             api_version =  os.getenv("IMAGE_API_VERSION")
