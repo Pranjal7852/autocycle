@@ -1,4 +1,4 @@
-# Project Documentation
+# Autocycle – Turning Waste Into Brand Value
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -11,11 +11,34 @@
    - [Architecture](#frontend-architecture)
    - [Setup](#frontend-setup)
    - [Components](#frontend-components)
-4. [Development Workflow](#development-workflow)
-5. [Deployment](#deployment)
+
+---
 
 ## Overview
-This project is a full-stack application that combines AI-powered brand analysis with a modern web interface. It uses CrewAI for intelligent brand and product analysis, with a React-based frontend for user interaction.
+
+**Closing the Loop Through Collaboration**  
+Waste isn’t worthless — it’s untapped brand value.  
+
+Autocycle connects **brands generating post-consumer plastic waste** with **companies sourcing recycled materials**.  
+Through **AI-driven matching, collaboration, and co-branding**, we help raise recycling rates, ensure high-quality material supply, and make dismantling financially worthwhile.  
+
+Our mission:  
+> “Turn waste streams into stories of innovation and circular value.”
+
+## ⚙️ How It Works
+
+Autocycle makes circular collaboration **simple, fast, and transparent**.
+
+1. **Fill the form about Waste Data**  
+   Share your post-consumer, excess, or overstock plastics.  
+2. **AI Material Matching**  
+   Our AI matches your materials with potential buyers — optimized for recyclability, location, and cost.  
+3. **Connect with Decision Makers**  
+   Skip the months of outreach. We bring you directly to verified partners.  
+4. **Co-Create & Scale**  
+   Align on supply and branding — recyclers and compounders join in to make it real.  
+
+Wherever you are, Autocycle connects the dots to turn waste into value — **making dismantling worth it** and **sourcing sustainable**.
 
 ## Backend Documentation
 
@@ -276,69 +299,5 @@ pnpm dev  # or npm run dev
    - Sustainability metrics
    - Comparison tools
 
-## Development Workflow
-
-### Backend Development:
-1. **Start the development server**:
-   ```bash
-   cd backend
-   uvicorn app.main:app --reload
-   ```
-
-2. **Run tests**:
-   ```bash
-   pytest
-   ```
-
-### Frontend Development:
-1. **Start the development server**:
-   ```bash
-   cd frontend/Autocycle_final
-   pnpm dev
-   ```
-
-2. **Build for production**:
-   ```bash
-   pnpm build
-   ```
-
-## Deployment
-
-### Backend Deployment:
-1. **Build Docker image**:
-   ```bash
-   cd backend
-   docker build -t backend-app .
-   ```
-
-2. **Run with Docker Compose**:
-   ```bash
-   docker-compose up -d
-   ```
-
-### Frontend Deployment:
-1. **Build production version**:
-   ```bash
-   cd frontend/Autocycle_final
-   pnpm build
-   ```
-
-2. **Deploy to hosting service**:
-   - Copy `dist` directory to your hosting service
-   - Configure environment variables
-   - Set up SSL certificates
-
-## Additional Resources
-
-### Documentation Links:
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [CrewAI Documentation](https://docs.crewai.com/)
-- [Weaviate Documentation](https://weaviate.io/developers/weaviate)
-- [React Documentation](https://reactjs.org/)
-- [Vite Documentation](https://vitejs.dev/)
-
-### Development Tools:
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-- [Docker Documentation](https://docs.docker.com/)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs) 
+### Live Demo:
+- [Final Product Show at DPS Munich](https://youtu.be/qolmGCnjg_4)
