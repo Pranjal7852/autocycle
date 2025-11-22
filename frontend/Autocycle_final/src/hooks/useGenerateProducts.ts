@@ -63,7 +63,7 @@ const dummyResponse: GenerateProductsResponse = {
     }
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://api.autocycle.dev";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://api.autocycle.dev/api/";
 
 export const useGenerateProducts = (): GenerateProductsHookResponse => {
     const [isLoading, setIsLoading] = useState(false);
