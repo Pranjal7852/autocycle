@@ -3,6 +3,7 @@ import os
 
 def llm_config():
     return LLM(
-     model="azure/gpt-4.1",
-    api_version=os.getenv('AZURE_API_VERSION')
+    model="gemini/gemini-2.5-flash",
+    api_version=os.getenv('MODEL'),
+    api_key=os.getenv('GEMINI_API_KEY')
 )

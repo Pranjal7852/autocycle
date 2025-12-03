@@ -20,21 +20,30 @@ class VectorDBManager:
         self._create_collections_if_not_exist()
 
     def _initialize_client(self):
-        # Get cloud configuration from environment variables
-        weaviate_url = os.getenv("WEAVIATE_URL")
-        weaviate_api_key = os.getenv("WEAVIATE_API_KEY")
-        weaviate_grpc_port = os.getenv("WEAVIATE_GRPC_PORT")
-        weaviate_grpc_url = os.getenv("WEAVIATE_GRPC_URL")
-        
-        if not weaviate_url or not weaviate_api_key:
-            raise ValueError("WEAVIATE_URL and WEAVIATE_API_KEY must be set in environment variables")
+        """
+        Initialize Weaviate client for local Docker deployment only.
 
-        # Initialize client with cloud authentication
-        self.client = weaviate.connect_to_weaviate_cloud(
-            cluster_url=weaviate_url,
-            auth_credentials=AuthApiKey(weaviate_api_key),
-            skip_init_checks=True
+        Assumes the Weaviate container from docker-compose is running on:
+        - HTTP:  http://localhost:8080
+        - gRPC:  localhost:50051
+
+        These can be overridden via:
+        - WEAVIATE_HOST
+        - WEAVIATE_HTTP_PORT
+        - WEAVIATE_GRPC_PORT
+        """
+
+        local_host = os.getenv("WEAVIATE_HOST", "localhost")
+        local_http_port = int(os.getenv("WEAVIATE_HTTP_PORT", "8080"))
+        local_grpc_port = int(os.getenv("WEAVIATE_GRPC_PORT", "50051"))
+
+        self.client = weaviate.connect_to_local(
+            host=local_host,
+            port=local_http_port,
+            grpc_port=local_grpc_port,
+            skip_init_checks=True,
         )
+
         print(self.client.is_ready())
 
     def _create_collections_if_not_exist(self):
