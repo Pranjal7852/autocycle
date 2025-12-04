@@ -6,10 +6,16 @@ import logging
 import traceback
 import requests
 import json
+import io
 from app.flows.brand_product_flow.crews.brand_product_developer.tools.azure_blob_uploader import upload_image_to_azure_blob
+from app.flows.brand_product_flow.crews.brand_product_developer.tools.gcs_blob_uploader import upload_image_to_gcs
+from google import genai
+from google.genai import types
+from PIL import Image
 
 logger = logging.getLogger(__name__)
-image_provider = os.getenv("AI_IMAGE_PROVIDER")
+image_provider = os.getenv("AI_IMAGE_PROVIDER", "GEMINI")
+storage_provider = os.getenv("STORAGE_PROVIDER", "GCS") 
 
 def ai_generate_image(prompt: str, product_name: str) -> str:
     try:
@@ -41,10 +47,9 @@ def ai_generate_image(prompt: str, product_name: str) -> str:
                 raise Exception(f"GPT OpenAI API request failed with status {response.status_code}: {response.text}")
             
             response_data = response.json()
-      
+            
             image_base64 = response_data['data'][0]['b64_json']
             image_bytes = base64.b64decode(image_base64)
-           
         
         elif image_provider == "AZURE":
             # Use Azure OpenAI endpoint with POST request
@@ -95,6 +100,27 @@ def ai_generate_image(prompt: str, product_name: str) -> str:
             )
             image_base64 = response.data[0].b64_json
             image_bytes = base64.b64decode(image_base64)
+        
+        elif image_provider == "GEMINI":
+            # Use Google Gemini image generation model
+            client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+            
+            response = client.models.generate_images(
+                model="imagen-4.0-generate-001",
+                prompt=prompt,
+                config=types.GenerateImagesConfig(
+                    number_of_images=1,
+                )
+            )
+
+            print("IMAGE DEBUG",response)
+            
+            # Extract image from response
+            image_bytes = response.generated_images[0].image.image_bytes
+            
+            if image_bytes is None:
+                raise Exception("No image data found in Gemini response")
+        
         else:
             raise ValueError(f"Invalid image provider: {image_provider}")
         
@@ -105,10 +131,16 @@ def ai_generate_image(prompt: str, product_name: str) -> str:
         logger.info(f"Image saved locally: {filename}")
 
         try:
-            image_url = upload_image_to_azure_blob(filename, product_name)
+            # Upload to storage based on configured provider
+            if storage_provider == "GCS":
+                image_url = upload_image_to_gcs(filename, product_name)
+            elif storage_provider == "AZURE":
+                image_url = upload_image_to_azure_blob(filename, product_name)
+            else:
+                raise ValueError(f"Invalid storage provider: {storage_provider}. Must be 'AZURE' or 'GCS'")
         except Exception as e:
-            logger.error(f"Azure Blob Storage upload failed: {e}", exc_info=True)
-            return f"Error: Upload to Azure Blob Storage failed. Details: {str(e)}"
+            logger.error(f"{storage_provider} Storage upload failed: {e}", exc_info=True)
+            return f"Error: Upload to {storage_provider} Storage failed. Details: {str(e)}"
 
         os.remove(filename)
         return image_url

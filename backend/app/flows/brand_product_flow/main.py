@@ -303,6 +303,5 @@ async def brand_product_kickoff(source_brand: str = "", plastic_type: str = "", 
     flow.state.plastic_type = plastic_type
     flow.state.location = location
     flow.state.target_brand = target_brand
-    flow.plot("BrandProductFlowPlot")
     logger.logger.info(flow.state)
     return await flow.kickoff_async()
