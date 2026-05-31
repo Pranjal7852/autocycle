@@ -89,9 +89,9 @@ const BrandMatch: React.FC = () => {
     brandPlacement: collab.brand_placement.join(", "),
     sustainabilityPlacement: collab.sustainability_placement,
     productAssumptions: collab.product_assumptions.join(", "),
-    estimatedImpact: `${collab.estimated_impact}M Tons`,
-    combinedReach: `${collab.combined_reach}M People`,
-    confidenceScore: `${collab.confidence_score}.00%`,
+    estimatedImpact: `${collab.estimated_impact} Tons`,
+    combinedReach: `${collab.combined_reach} People`,
+    confidenceScore: `${collab.confidence_score}%`,
     logoUrl: collab.logo_url,
     companyDomain: collab.company_domain,
   }));

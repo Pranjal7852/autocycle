@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from datetime import datetime
 from dotenv import load_dotenv
+import os
 from app.flows.brand_research_flow.main import brand_research_kickoff
 from app.flows.brand_product_flow.main import brand_product_kickoff
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,12 +12,18 @@ load_dotenv()
 
 app = FastAPI()
 
+# Get allowed origins from environment variable, default to wildcard for local dev
+allowed_origins = os.getenv("FRONTEND_URL", "http://localhost:8080").split(",")
+# Optional: if you want to allow all temporarily, you could append "*"
+if "*" in allowed_origins:
+    allowed_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # Allow your frontend origin
+    allow_origins=allowed_origins,  # Allow dynamic frontend origins
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],  # Allow POST and OPTIONS for preflight
-    allow_headers=["Content-Type"],  # Allow Content-Type header
+    allow_headers=["*"],  # Allow all headers
 )
 class GenerateBrandRequest(BaseModel):
     brand: str
@@ -62,14 +69,18 @@ async def analyze_plastic_reuse(request: GenerateBrandRequest):
 @app.post("/generateproducts")
 async def generate_products(request: GenerateProductsRequest):
     try:
-        data_manager = PostgresManager()
-        # Step 1: Check existing collaboration
-        existing_data = data_manager.get_collaboration_with_products(
-            source_brand=request.source_brand,
-            target_brand=request.target_brand,
-            plastic_type=request.plastic_type,
-            location=request.location
-        )
+        use_postgres = os.getenv("USE_POSTGRES", "true").lower() == "true"
+        existing_data = None
+
+        if use_postgres:
+            data_manager = PostgresManager()
+            # Step 1: Check existing collaboration
+            existing_data = data_manager.get_collaboration_with_products(
+                source_brand=request.source_brand,
+                target_brand=request.target_brand,
+                plastic_type=request.plastic_type,
+                location=request.location
+            )
 
         # Step 2: If found and enough products exist, return them
         if existing_data and len(existing_data["products"]) >= 1:

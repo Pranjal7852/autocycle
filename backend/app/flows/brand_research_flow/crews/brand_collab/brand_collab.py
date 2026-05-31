@@ -30,9 +30,9 @@ class CollaborationRecommendation(BaseModel):
     sustainability_placement: str = Field(description="Brand's sustainability approach")
     product_assumptions: List[str] = Field(description="Potential physical product types")
     collaboration_summary: str = Field(description="Brief description of the collaboration concept")
-    estimated_impact: Optional[int] = Field(default=None, description="Potential environmental or market impact in million")
+    estimated_impact: Optional[str] = Field(default=None, description="Potential environmental or market impact formatted as string (e.g., '75M', '1.2B')")
     confidence_score: Optional[int] = Field(default=None, description="Confidence score")
-    combined_reach: Optional[int] = Field(default=None, description="Combined marketing reach of both brands in millions")
+    combined_reach: Optional[str] = Field(default=None, description="Combined marketing reach of both brands formatted as string (e.g., '50M', '2.5B')")
     logo_url: Optional[str] = Field(default=None, description="Brand logo URL from Logo.dev API")
     company_domain: Optional[str] = Field(default=None, description="Brand domain from Logo.dev API")
 
@@ -119,9 +119,9 @@ For each recommendation, provide:
 - sustainability_placement: Their current sustainability positioning or commitment
 - product_assumptions: List of 2-4 specific physical product concepts that could work (e.g., ["Chair", "Toy", "Shoe"])
 - collaboration_summary: 2-3 sentence description explaining the collaboration concept and its strategic value
-- estimated_impact: Estimated potential environmental or market impact in millions (revenue, carbon savings, etc.)
+- estimated_impact: Estimated potential environmental or market impact as a string (e.g., '75M', '2.5B')
 - confidence_score: Your confidence in this recommendation on a scale of 1-100
-- combined_reach: Combined marketing reach of both brands in millions (social media followers, customers, newsletter subscribers, etc.)
+- combined_reach: Combined marketing reach of both brands as a string (e.g., '50M', '100K')
 
 Focus exclusively on physical, manufacturable products. Consider:
 - How the plastic material's properties enable unique product features
@@ -145,9 +145,9 @@ Prioritize collaborations that create genuine value for both brands and demonstr
       "sustainability_placement": "string",
       "product_assumptions": ["string", ...],
       "collaboration_summary": "string"
-      "estimated_impact": "int"
+      "estimated_impact": "str"
     "confidence_score": "int"
-    "combined_reach":t "int"
+    "combined_reach": "str"
     }
   ]
 }

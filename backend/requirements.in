@@ -213,4 +213,4 @@ websockets
 wrapt
 yarl
 zipp
-zstandard
+zstandardgoogle-cloud-storage==2.14.0

@@ -2,6 +2,7 @@ from typing import Dict, Optional
 import uuid
 import logging
 from datetime import datetime
+import os
 from pydantic import BaseModel, validator, ValidationError
 
 from app.database.vector_db import VectorDBManager
@@ -13,13 +14,15 @@ from psycopg2.extras import Json
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+USE_POSTGRES = os.getenv("USE_POSTGRES", "true").lower() == "true"
+
 # Pydantic models for input validation
 
 
 class DataManager:
     def __init__(self):
         self.vector_db = VectorDBManager()
-        self.postgres_db = PostgresManager()
+        self.postgres_db = PostgresManager() if USE_POSTGRES else None
 
     @staticmethod
     def sanitize_input(data):
@@ -49,10 +52,11 @@ class DataManager:
                 distance = top_result["distance"]
                 similarity_score = max(0.0, min(1.0, 1 - (distance / 2)))  # clamp between 0 and 1
 
-                full_data = self.postgres_db.get_brand_by_id(brand_id)
-                if full_data:
-                    full_data["similarity_score"] = similarity_score
-                    return self.sanitize_input(full_data) if full_data else None
+                if self.postgres_db:
+                    full_data = self.postgres_db.get_brand_by_id(brand_id)
+                    if full_data:
+                        full_data["similarity_score"] = similarity_score
+                        return self.sanitize_input(full_data) if full_data else None
             return None
         except Exception as e:
             logger.error(f"Error searching brand '{brand_name}': {e}")
@@ -71,10 +75,11 @@ class DataManager:
                 distance = top_result["distance"]
                 similarity_score = max(0.0, min(1.0, 1 - (distance / 2)))
 
-                full_data = self.postgres_db.get_plastic_by_id(plastic_id)
-                if full_data:
-                    full_data["similarity_score"] = similarity_score
-                    return self.sanitize_input(full_data) if full_data else None
+                if self.postgres_db:
+                    full_data = self.postgres_db.get_plastic_by_id(plastic_id)
+                    if full_data:
+                        full_data["similarity_score"] = similarity_score
+                        return self.sanitize_input(full_data) if full_data else None
             return None
         except Exception as e:
             logger.error(f"Error searching plastic type '{plastic_type}': {e}")
@@ -100,7 +105,8 @@ class DataManager:
             brand_dict["brand_id"] = brand_id
             
             # Store in PostgreSQL
-            self.postgres_db.store_brand_data(brand_dict)
+            if self.postgres_db:
+                self.postgres_db.store_brand_data(brand_dict)
 
             # Store in vector DB
             self.vector_db.add_brand(brand_model, brand_id)
@@ -130,7 +136,8 @@ class DataManager:
             plastic_dict["plastic_id"] = plastic_id
            
             # Store in PostgreSQL
-            self.postgres_db.store_plastic_data(plastic_dict)
+            if self.postgres_db:
+                self.postgres_db.store_plastic_data(plastic_dict)
 
             # Store in vector DB
             self.vector_db.add_plastic_type(plastic_model, plastic_id)
@@ -148,6 +155,8 @@ class DataManager:
         """
         Create a new collaboration entry in the database.
         """
+        if not self.postgres_db:
+            return 0
         try:
             collaboration_id = self.postgres_db.create_or_get_collaboration(
                 source_brand=source_brand,
@@ -165,6 +174,8 @@ class DataManager:
         """
         Add a product idea to an existing collaboration in the database.
         """
+        if not self.postgres_db:
+            return 0
         try:
             product_id = self.postgres_db.add_collaboration_product(collaboration_id, product_data)
             logger.info(f"Saved collaboration product with ID: {product_id}")

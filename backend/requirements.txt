@@ -1107,3 +1107,4 @@ zstandard==0.23.0
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
+google-cloud-storage==2.14.0

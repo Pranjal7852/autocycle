@@ -20,6 +20,11 @@ class VectorDBManager:
         self._create_collections_if_not_exist()
 
     def _initialize_client(self):
+        self.use_vector_db = os.getenv("USE_VECTOR_DB", "true").lower() == "true"
+        if not self.use_vector_db:
+            logging.info("Vector DB is disabled via USE_VECTOR_DB feature flag. Skipping initialization.")
+            return
+
         # Get cloud configuration from environment variables
         weaviate_url = os.getenv("WEAVIATE_URL")
         weaviate_api_key = os.getenv("WEAVIATE_API_KEY")
@@ -38,6 +43,9 @@ class VectorDBManager:
         print(self.client.is_ready())
 
     def _create_collections_if_not_exist(self):
+        if not getattr(self, 'use_vector_db', True):
+            return
+
         existing_collections = self.client.collections.list_all()
 
         if "Brand" not in existing_collections:
@@ -61,6 +69,9 @@ class VectorDBManager:
             )
 
     def object_exists(self, collection_name: str, object_id: str) -> bool:
+        if not getattr(self, 'use_vector_db', True):
+            return False
+
         try:
             collection = self.client.collections.get(collection_name)
             result = collection.query.fetch_object_by_id(object_id)
@@ -71,6 +82,9 @@ class VectorDBManager:
             return False
 
     def add_brand(self, brand_model: BrandProfile, brand_id: str):
+        if not getattr(self, 'use_vector_db', True):
+            return
+
         embedding_text = brand_model.to_embedding_text().lower()
         embedding = self.model.encode(embedding_text)
         print("VECTORDB INSERT DEBUG - brand_data:", {
@@ -89,6 +103,9 @@ class VectorDBManager:
         )
 
     def add_plastic_type(self, plastic_model: PlasticMaterialProfile, plastic_id: str):
+        if not getattr(self, 'use_vector_db', True):
+            return
+
         embedding_text = plastic_model.to_embedding_text().lower()
         embedding = self.model.encode(embedding_text)
         collection = self.client.collections.get("PlasticType")
@@ -127,6 +144,9 @@ class VectorDBManager:
             raise
 
     def search_brand(self, query: str, limit: int = 3):
+        if not getattr(self, 'use_vector_db', True):
+            return []
+
         embedding_text = (
     f"{query.lower()} is a global brand in its respective industry.\n"
     f"It offers products or services aligned with its market positioning.\n"
@@ -157,6 +177,9 @@ class VectorDBManager:
         ]
 
     def search_plastic_type(self, query: str, limit: int = 3):
+        if not getattr(self, 'use_vector_db', True):
+            return []
+
         embedding_text = f"Plastic type: {query}".lower()  
         query_embedding = self.model.encode(embedding_text)
         results = (

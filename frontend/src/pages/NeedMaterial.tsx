@@ -134,6 +134,7 @@ const NeedMaterial: React.FC = () => {
               value={formData.brand}
               onChange={handleInputChange}
               placeholder="Company Name"
+              required
               className="w-full h-16 px-4 border-2 border-border font-sans text-base text-muted-foreground rounded-lg"
             />
           </div>
@@ -168,6 +169,7 @@ const NeedMaterial: React.FC = () => {
                 value={formData.location}
                 onChange={handleInputChange}
                 placeholder="City (e.g., München)"
+                required
                 className="w-full h-16 px-4 border-2 border-border font-sans text-base text-muted-foreground rounded-lg"
               />
             </div>

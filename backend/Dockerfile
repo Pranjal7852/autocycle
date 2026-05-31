@@ -1,19 +1,23 @@
-# Use a Conda base image
-FROM continuumio/miniconda3
+FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy environment.yml to define dependencies
-COPY environment.yml .
+# Install system dependencies (needed for psycopg2, building wheels, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create Conda environment from environment.yml
-RUN conda env create -f environment.yml && \
-    conda clean --all --yes
+# Install uv
+RUN pip install uv
 
-# Ensure the env name matches your environment.yml
-ARG ENV_NAME=dps-ai-pipeline
-ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
+# Copy requirements files
+COPY requirements.txt .
+
+# Install dependencies using uv
+RUN uv pip install --system -r requirements.txt
 
 # Copy application code
 COPY . .

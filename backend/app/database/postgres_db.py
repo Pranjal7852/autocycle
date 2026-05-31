@@ -4,29 +4,27 @@ from dotenv import load_dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor, Json
 
+DATABASE_URL = os.getenv('DATABASE_URL')
+
 # Load env vars
 load_dotenv()
-
-POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
-POSTGRES_PORT = os.getenv('POSTGRES_PORT', '5432')
-POSTGRES_DB = os.getenv('POSTGRES_DB')
-POSTGRES_USER = os.getenv('POSTGRES_USER')
-POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+if not DATABASE_URL:
+    POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
+    POSTGRES_PORT = os.getenv('POSTGRES_PORT', '5432')
+    POSTGRES_DB = os.getenv('POSTGRES_DB')
+    POSTGRES_USER = os.getenv('POSTGRES_USER')
+    POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+    DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+    
 
 
 class PostgresManager:
     def __init__(self):
-        self.conn_params = {
-            "host": POSTGRES_HOST,
-            "port": POSTGRES_PORT,
-            "dbname": POSTGRES_DB,
-            "user": POSTGRES_USER,
-            "password": POSTGRES_PASSWORD
-        }
+        self.db_url = DATABASE_URL
         self._init_tables()
 
     def _get_connection(self):
-        conn = psycopg2.connect(**self.conn_params)
+        conn = psycopg2.connect(self.db_url)
         conn.autocommit = True
         return conn
 

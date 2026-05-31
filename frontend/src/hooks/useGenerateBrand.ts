@@ -14,9 +14,9 @@ interface CollaborationBrand {
     sustainability_placement: string;
     product_assumptions: string[];
     collaboration_summary: string;
-    estimated_impact: number;
+    estimated_impact: string;
     confidence_score: number;
-    combined_reach: number;
+    combined_reach: string;
     logo_url: string;
     company_domain: string;
 }
@@ -60,7 +60,8 @@ export const useGenerateBrand = (): GenerateBrandHookResponse => {
 
             console.log("Sending payload to /generatebrand:", data);
 
-            const response = await axios.post<GenerateBrandResponse>("http://0.0.0.0:8000/generatebrand", {
+            const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+            const response = await axios.post<GenerateBrandResponse>(`${API_URL}/generatebrand`, {
                 brand: data.brand || "",
                 plastic_type: data.plastic_type,
                 location: data.location,
@@ -70,6 +71,10 @@ export const useGenerateBrand = (): GenerateBrandHookResponse => {
             console.log("Received response from /generatebrand:", response.data);
             return response.data;
         } catch (err) {
+            if (err instanceof Error && !(err as any).isAxiosError) {
+                setError(err.message);
+                throw err;
+            }
             const error = err as AxiosError<GenerateBrandResponse>;
             const errorMessage = error.response?.data?.message || error.response?.data?.detail || "Failed to submit form. Please check your inputs and try again.";
             setError(errorMessage);

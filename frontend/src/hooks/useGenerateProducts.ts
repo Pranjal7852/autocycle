@@ -76,7 +76,8 @@ export const useGenerateProducts = (): GenerateProductsHookResponse => {
                 throw new Error("Factory location is required.");
             }
 
-            const response = await fetch('http://0.0.0.0:8000/generateproducts', {
+            const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+            const response = await fetch(`${API_URL}/generateproducts`, {
                 method: 'POST',
                 headers: {
                     'accept': 'application/json',
